@@ -17,4 +17,5 @@ test("Amazon Search", async () => {
     .click();
   await page.locator("//a[contains(text(),'Go to Cart')]").click();
   expect(page.locator("//span[@class='a-truncate-cut']")).toContainText(productName);
+  await page.close();
 });
