@@ -1,7 +1,8 @@
 https://playwright.dev/docs/test-assertions
+https://playwright.dev/docs/test-annotations
 https://hclcontent.percipio.com/journey/5ece9d19-99b1-4c6d-abf1-1d3ccab2cce3
 Commands to execute test:
-1. To run call test: 
+1. To run all test: 
     npx playwright test
 2. To run specific spec file:
     npx playwright test /specName.spec.js
@@ -13,3 +14,6 @@ Commands to execute test:
     npx playwright test --grep "@tagName1|@tagName2"
 6. To run tests containing both tags (logical AND operator) using regex lookaheads:
     npx playwright test --grep "(?=.*@tagName1)(?=.*@tagName2)"
+-----------------------------------------------------------
+To view execution report:
+npx playwright show-report
