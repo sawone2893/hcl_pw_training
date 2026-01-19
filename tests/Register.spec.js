@@ -1,7 +1,6 @@
-const { test, expect } = require("@playwright/test");
-import { GUIElementsPage } from "../pages/GUIElementsPage";
-test("Register User", async ({ page }) => {
-let gUIElementsPage=new GUIElementsPage(page);
+import { test, expect } from "../fixtures/PageFixtures";
+
+test("Register User", async ({ gUIElementsPage }) => {
 await gUIElementsPage.navigateToPage();
 await gUIElementsPage.enterName("Shabbir");
 await gUIElementsPage.enterEmail("xyz@gmail.com");
@@ -11,5 +10,4 @@ await gUIElementsPage.selectDay("sunday");
 await gUIElementsPage.selectCountry("india");
 await gUIElementsPage.selectColors(["green", "blue"]);
 await gUIElementsPage.selectAnimals(["cat","cheetah"]);
-
 });
