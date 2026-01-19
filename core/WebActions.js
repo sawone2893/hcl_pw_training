@@ -1,34 +1,42 @@
 export class WebActions {
   constructor(page) {
-    this.page=page;
+    this.page = page;
   }
 
-  async getLocator(locatortype, locator) {
+  getLocator(locatortype, locator) {
     let element;
     switch (locatortype.toLowerCase()) {
       case "placeholder":
-        element= await this.page.getByPlaceholder(locator);
+        element = this.page.getByPlaceholder(locator);
+        break;
       case "label":
-        element= await this.page.getByLabel(locator);
+        element = this.page.getByLabel(locator);
+        break;
       case "text":
-        element= await this.page.getByText(locator);
+        element = this.page.getByText(locator);
+        break;
       case "title":
-        element= await this.page.getByTitle(locator);
+        element = this.page.getByTitle(locator);
+        break;
       case "testid":
-        element= await this.page.getByTestId(locator);
+        element = this.page.getByTestId(locator);
+        break;
       case "role":
-        element= this.page.getByRole(locator);
+        element = this.page.getByRole(locator);
+        break;
       case "alttext":
-        element= await this.page.getByAltText();
+        element = this.page.getByAltText();
+        break;
       case "xpath":
       case "css":
-        element=await this.page.locator(locator);
+        element = this.page.locator(locator);
+        break;
       default:
-          throw Error("Invalid Locator type!");
+        throw Error("Invalid Locator type!");
     }
     return element;
   }
-  async navigateTo(url){
+  async navigateTo(url) {
     await this.page.goto(url);
   }
   async clickElement(locatortype, locator) {
@@ -41,7 +49,7 @@ export class WebActions {
     await this.getLocator(locatortype, locator).fill(text);
   }
   async selectDropDown(locator, options) {
-    await this.page.selectOption(locator, optionValue);
+    await this.page.selectOption(locator, options);
   }
 
   async acceptAlert(locatortype, locator) {
