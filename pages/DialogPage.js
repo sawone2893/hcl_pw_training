@@ -4,6 +4,9 @@ export class DialogPage extends BasePage {
     super(page);
   }
 
+  async navigateToDialog(){
+    await this.actions.navigateTo("/");
+  }
   async acceptSimpleAlert() {
     await this.actions.acceptAlert("role", "button,Simple Alert");
   }
@@ -12,5 +15,8 @@ export class DialogPage extends BasePage {
   }
   async acceptPromptAlert(text) {
     await this.actions.typeInAlert("role", "button,Prompt Alert", text);
+  }
+  getVisibleMessageElement() {
+    return this.actions.getLocator("css", "#demo");
   }
 }
