@@ -1,7 +1,7 @@
 const { test: base } = require("@playwright/test");
 const { GUIElementsPage } = require("../pages/GUIElementsPage.js");
 const { DialogPage } = require("../pages/DialogPage.js");
-
+const {WebAssertion}=require("../webAssertions/WebAssertions.js")
 exports.test = base.extend({
   //Define the "loginPage" fixture
   gUIElementsPage: async ({ page }, use) => {
@@ -12,6 +12,10 @@ exports.test = base.extend({
   dialogPage: async ({ page }, use) => {
     const dialogPage = new DialogPage(page);
     await use(dialogPage);
+  },
+    assert: async ({}, use) => {
+    const assert = new WebAssertion();
+    await use(assert);
   },
 });
 
