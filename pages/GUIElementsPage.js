@@ -4,7 +4,7 @@ export class GUIElementsPage extends BasePage {
     super(page);
   }
 
-  pageObject = {};
+  pageLocators = {};
 
   async navigateToPage() {
     await this.actions.navigateTo("/");
@@ -42,7 +42,7 @@ export class GUIElementsPage extends BasePage {
   }
 
   async selectDatePicker2(dateValue) {
-    await this.selectDateFromDatePickerWithMonthYearDropdown(dateValue);
+    await this.selectDateFromDatePickerWithMonthYearDropdown(dateValue,"#txtDate");
   }
 
   async selectStartDate(dateValue) {

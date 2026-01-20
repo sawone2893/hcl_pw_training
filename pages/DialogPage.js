@@ -3,8 +3,8 @@ export class DialogPage extends BasePage {
   constructor(page) {
     super(page);
   }
-
-  async navigateToDialog(){
+  pageLocators = {};
+  async navigateToDialog() {
     await this.actions.navigateTo("/");
   }
   async acceptSimpleAlert() {
