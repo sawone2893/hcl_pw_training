@@ -77,4 +77,8 @@ export class WebActions {
   async isDisplayed(locatortype, locator) {
     return await this.getLocator(locatortype, locator).isVisible();
   }
+
+  async wait(timeInSeconds) {
+    await this.page.waitForTimeout(timeInSeconds * 1000);
+  }
 }
