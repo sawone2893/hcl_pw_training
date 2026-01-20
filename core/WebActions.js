@@ -22,8 +22,8 @@ export class WebActions {
         element = this.page.getByTestId(locator);
         break;
       case "role":
-        let data=locator.split(",")
-        element = this.page.getByRole(`${data[0]}`,{name:`${data[1]}`});
+        let data = locator.split(",");
+        element = this.page.getByRole(`${data[0]}`, { name: `${data[1]}` });
         break;
       case "alttext":
         element = this.page.getByAltText();
@@ -67,10 +67,14 @@ export class WebActions {
     this.page.on("dialog", (dialog) => dialog.accept(text));
     await this.clickElement(locatortype, locator);
   }
-  async getText(locatortype, locator){
-     return await this.getLocator(locatortype, locator).textContent();
+  getText(locatortype, locator) {
+    return this.getLocator(locatortype, locator).textContent();
   }
-  async closePage(){
+  async closePage() {
     await this.page.close();
+  }
+
+  async isDisplayed(locatortype, locator) {
+    return await this.getLocator(locatortype, locator).isVisible();
   }
 }
