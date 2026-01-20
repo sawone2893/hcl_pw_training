@@ -22,7 +22,8 @@ export class WebActions {
         element = this.page.getByTestId(locator);
         break;
       case "role":
-        element = this.page.getByRole(locator);
+        let data=locator.split(",")
+        element = this.page.getByRole(`${data[0]}`,{name:`${data[1]}`});
         break;
       case "alttext":
         element = this.page.getByAltText();
