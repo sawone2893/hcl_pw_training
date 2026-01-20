@@ -1,8 +1,8 @@
-const { test: base } = require('@playwright/test');
-const { GUIElementsPage } = require('../pages/GUIElementsPage.js');
-import { DialogPage } from '../pages/DialogPage.js';
-exports.test = base.extend({
+const { test: base } = require("@playwright/test");
+const { GUIElementsPage } = require("../pages/GUIElementsPage.js");
+const { DialogPage } = require("../pages/DialogPage.js");
 
+exports.test = base.extend({
   //Define the "loginPage" fixture
   gUIElementsPage: async ({ page }, use) => {
     const gUIElementsPage = new GUIElementsPage(page);
