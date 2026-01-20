@@ -1,6 +1,16 @@
-import {BasePage} from "../pages/BasePage";
-export class DialogPage extends BasePage{
+import { BasePage } from "../pages/BasePage";
+export class DialogPage extends BasePage {
   constructor(page) {
     super(page);
+  }
+
+  async acceptSimpleAlert() {
+    await this.actions.acceptAlert("role", "button,Simple Alert");
+  }
+  async acceptConfirmationAlert() {
+    await this.actions.acceptAlert("role", "button,Confirmation Alert");
+  }
+  async acceptPromptAlert(text) {
+    await this.actions.typeInAlert("role", "button,Prompt Alert", text);
   }
 }
