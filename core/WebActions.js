@@ -67,4 +67,10 @@ export class WebActions {
     this.page.on("dialog", (dialog) => dialog.accept(text));
     await this.clickElement(locatortype, locator);
   }
+  async getText(locatortype, locator){
+     return await this.getLocator(locatortype, locator).textContent();
+  }
+  async closePage(){
+    await this.page.close();
+  }
 }
