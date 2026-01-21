@@ -17,3 +17,16 @@ Commands to execute test:
 -----------------------------------------------------------
 To view execution report:
 npx playwright show-report
+
+==========================================
+Topics covered in the framework:
+-------------------------------
+1. Locators and User Interactions
+2. Fixtures
+3. POM
+4. Utitlies
+5. tags
+6. Test Grouping
+7. Screenshot,Video and reports
+8. Multi-Environment Support
+9. Parallet execution Support.
