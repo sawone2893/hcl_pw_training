@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "set ENV=qa&&npx playwright test --grep @register --headed"
+    "test:qa": "set ENV=qa&&npx playwright test --grep @register --headed",
+    "test:dev": "set ENV=dev&&npx playwright test --grep @register --headed"
   },
   "keywords": [],
   "author": "",
