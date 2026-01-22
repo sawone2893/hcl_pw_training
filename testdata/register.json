@@ -1,0 +1,15 @@
+{
+  "name":"shab",
+  "email":"xyz@gmail.com",
+  "phone":"8976452354",
+  "gender":"male",
+  "day":"sunday",
+  "country":"india",
+  "colors":["green", "blue"],
+  "datePicker1":"2 January 2026",
+  "datePicker2":"12 Jan 2026",
+  "animals":["cat", "cheetah"],
+  "startDate":"2026-01-14",
+  "endDate":"2026-01-15",
+  "expectedMessage":"You selected a range of 1 days."
+}

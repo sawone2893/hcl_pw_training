@@ -1,19 +1,19 @@
 import { test} from "../fixtures/PageFixtures";
-
+import register from "../testdata/register.json";
 test("Register User",{ tag: "@register" }, async ({ gUIElementsPage,assert }) => {
   await gUIElementsPage.navigateToPage();
-  await gUIElementsPage.enterName("Shabbir");
-  await gUIElementsPage.enterEmail("xyz@gmail.com");
-  await gUIElementsPage.enterPhone("8987435643");
-  await gUIElementsPage.selectGender("male");
-  await gUIElementsPage.selectDay("sunday");
-  await gUIElementsPage.selectCountry("india");
-  await gUIElementsPage.selectColors(["green", "blue"]);
-  await gUIElementsPage.selectAnimals(["cat", "cheetah"]);
-  await gUIElementsPage.selectDatePicker1("2 January 2026");
-  await gUIElementsPage.selectDatePicker2("12 Jan 2026");
-  await gUIElementsPage.selectStartDate("2026-01-14");
-  await gUIElementsPage.selectEndDate("2026-01-15");
+  await gUIElementsPage.enterName(register.name);
+  await gUIElementsPage.enterEmail(register.email);
+  await gUIElementsPage.enterPhone(register.phone);
+  await gUIElementsPage.selectGender(register.gender);
+  await gUIElementsPage.selectDay(register.day);
+  await gUIElementsPage.selectCountry(register.country);
+  await gUIElementsPage.selectColors(register.colors);
+  await gUIElementsPage.selectAnimals(register.animals);
+  await gUIElementsPage.selectDatePicker1(register.datePicker1);
+  await gUIElementsPage.selectDatePicker2(register.datePicker2);
+  await gUIElementsPage.selectStartDate(register.startDate);
+  await gUIElementsPage.selectEndDate(register.endDate);
   await gUIElementsPage.clickSubmitBtn();
-  assert.validateExactText(gUIElementsPage.getMessageLocator(),"You selected a range of 1 days.");
+  assert.validateExactText(gUIElementsPage.getMessageLocator(),register.expectedMessage);
 });
