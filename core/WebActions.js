@@ -207,7 +207,33 @@ export class WebActions {
     await download.saveAs(`${locationToSave}/${download.suggestedFilename()}`);
   }
 
-  async getTextFromReadOnlyInput(locator) {
+   async getTextFromReadOnlyInput(locator) {
     return await this.page.inputValue(locator);
+  }
+
+  async getText(locatortype, locator){
+    if (this.waitUntillElementAppear(locatortype, locator)) {
+      return await this.getLocator(locatortype,locator).textContent();
+    } else {
+      throw new Error(
+        `Unable to fetch text for Element :: locator:${locator} is not present in the DOM or displayed`,
+      );
+    }
+  }
+
+  async performKeyOperation(keyComination){
+    await this.page.keyboard.press(keyComination);
+  }
+
+  async dragAndDrop(locatortype,srcLocator,destLocator){
+    if (this.waitUntillElementAppear(locatortype, srcLocator)) {
+       await this.getLocator(locatortype,srcLocator).dragTo(this.getLocator(locatortype,destLocator));
+    } else {
+      throw new Error(
+        `Unable to perform Drag and Drop on Element :: locator:${locator} is not present in the DOM or displayed`,
+      );
+    }
+    
+   
   }
 }
