@@ -37,6 +37,18 @@ export class WebActions {
     }
     return element;
   }
+  async getLocatorCount(elements) {
+    return await elements.count();
+  }
+  async getNthLocator(elements, index) {
+    return await elements.nth(index);
+  }
+  async getChildLocator(element, locatorStr) {
+    return await element.locator(locatorStr);
+  }
+  async getSpecificLocator(elements, searchText) {
+    return await elements.filter({ hasText: `${searchText}` });
+  }
   async navigateTo(url) {
     await this.page.goto(url);
   }
@@ -155,6 +167,9 @@ export class WebActions {
   getText(locatortype, locator) {
     return this.getLocator(locatortype, locator).textContent();
   }
+  getText(locator) {
+    return locator.textContent();
+  }
   async closePage() {
     await this.page.close();
   }
@@ -207,13 +222,13 @@ export class WebActions {
     await download.saveAs(`${locationToSave}/${download.suggestedFilename()}`);
   }
 
-   async getTextFromReadOnlyInput(locator) {
+  async getTextFromReadOnlyInput(locator) {
     return await this.page.inputValue(locator);
   }
 
-  async getText(locatortype, locator){
+  async getText(locatortype, locator) {
     if (this.waitUntillElementAppear(locatortype, locator)) {
-      return await this.getLocator(locatortype,locator).textContent();
+      return await this.getLocator(locatortype, locator).textContent();
     } else {
       throw new Error(
         `Unable to fetch text for Element :: locator:${locator} is not present in the DOM or displayed`,
@@ -221,19 +236,19 @@ export class WebActions {
     }
   }
 
-  async performKeyOperation(keyComination){
+  async performKeyOperation(keyComination) {
     await this.page.keyboard.press(keyComination);
   }
 
-  async dragAndDrop(locatortype,srcLocator,destLocator){
+  async dragAndDrop(locatortype, srcLocator, destLocator) {
     if (this.waitUntillElementAppear(locatortype, srcLocator)) {
-       await this.getLocator(locatortype,srcLocator).dragTo(this.getLocator(locatortype,destLocator));
+      await this.getLocator(locatortype, srcLocator).dragTo(
+        this.getLocator(locatortype, destLocator),
+      );
     } else {
       throw new Error(
         `Unable to perform Drag and Drop on Element :: locator:${locator} is not present in the DOM or displayed`,
       );
     }
-    
-   
   }
 }
