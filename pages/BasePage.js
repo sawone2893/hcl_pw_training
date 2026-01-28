@@ -13,6 +13,7 @@ export class BasePage {
     datePickerDay: (daytext) => `//a[@data-date='${daytext}']`,
     datePickerSelectDropDownMonthYear: (dropdownType) =>
       `//select[contains(@aria-label,'${dropdownType}')]`,
+    radioCheckboxLocator:(labelName)=>`//label[text()='${labelName}']/preceding::input[1]`
   };
 
   generateLocator(locatorIdentifier, params) {
