@@ -13,7 +13,10 @@ export class BasePage {
     datePickerDay: (daytext) => `//a[@data-date='${daytext}']`,
     datePickerSelectDropDownMonthYear: (dropdownType) =>
       `//select[contains(@aria-label,'${dropdownType}')]`,
-    radioCheckboxLocator:(labelName)=>`//label[text()='${labelName}']/preceding::input[1]`
+    radioCheckboxLocator: (labelName) =>
+      `//label[text()='${labelName}']/preceding::input[1]`,
+    webTable: (attributeName, attributeValue) =>
+      "//table[@${attributeName}='${attributeValue}']/tbody/tr",
   };
 
   generateLocator(locatorIdentifier, params) {
@@ -89,5 +92,28 @@ export class BasePage {
       "xpath",
       this.baseLocators.datePickerDay(dayText),
     );
+  }
+
+  async getTableRows(attributeName, attributeValue) {
+    return await this.actions.getLocator(
+      "xpath",
+      this.baseLocators.webTable(attributeName, attributeValue),
+    );
+  }
+
+  async getRowsCount(tableRows) {
+    return await this.actions.getLocatorCount(tableRows);
+  }
+
+  async getNthRow(tableRows, index) {
+    return await this.actions.getNthLocator(tableRows, index);
+  }
+
+  async getRowCells(row, cellLocator) {
+    return await this.actions.getChildLocator(row, cellLocator);
+  }
+
+  async getSpecificRow(rows, searchText) {
+    return await this.getSpecificRow(rows, searchText);
   }
 }
