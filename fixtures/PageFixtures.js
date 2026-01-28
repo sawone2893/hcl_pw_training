@@ -1,7 +1,8 @@
 const { test: base } = require("@playwright/test");
 const { GUIElementsPage } = require("../pages/GUIElementsPage.js");
 const { DialogPage } = require("../pages/DialogPage.js");
-const {MouseKeyboardPage}=require("../pages/MouseKeyboardPage.js");
+const { MouseKeyboardPage } = require("../pages/MouseKeyboardPage.js");
+const { WebTablePage } = require("../pages/WebTablePage.js");
 const { WebAssertion } = require("../webAssertions/WebAssertions.js");
 exports.test = base.extend({
   //Define the "loginPage" fixture
@@ -14,11 +15,15 @@ exports.test = base.extend({
     const dialogPage = new DialogPage(page);
     await use(dialogPage);
   },
-
   //Define the "mouseKeyboardPage" fixture
   mouseKeyboardPage: async ({ page }, use) => {
     const mouseKeyboardPage = new MouseKeyboardPage(page);
     await use(mouseKeyboardPage);
+  },
+  //Define the "webTablePage" fixture
+  webTablePage: async ({ page }, use) => {
+    const webTablePage = new WebTablePage(page);
+    await use(webTablePage);
   },
 
   assert: async ({}, use) => {
