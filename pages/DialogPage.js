@@ -23,7 +23,7 @@ export class DialogPage extends BasePage {
       text,
     );
   }
-  getVisibleMessageElement() {
-    return this.actions.getLocator("css", "#demo");
+  async getVisibleMessageElementText() {
+    return await this.actions.getText(this.actions.getLocator("css", "#demo"));
   }
 }

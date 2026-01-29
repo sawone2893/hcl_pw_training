@@ -7,7 +7,7 @@ import { test } from "../fixtures/PageFixtures";
  * Hooks
  * Tags:
  */
-test.describe("Test Dialogs", async () => {
+test.describe("Test Dialogs", { tag: "@dialogs" }, async () => {
   test("Simple Alert", { tag: "@sa" }, async ({ dialogPage }) => {
     await dialogPage.navigateToDialog();
     await dialogPage.acceptSimpleAlert();
@@ -17,7 +17,7 @@ test.describe("Test Dialogs", async () => {
     await dialogPage.navigateToDialog();
     await dialogPage.acceptConfirmationAlert();
     assert.validatePartialText(
-      dialogPage.getVisibleMessageElement(),
+      await dialogPage.getVisibleMessageElementText(),
       "You pressed OK!",
     );
   });
@@ -26,7 +26,7 @@ test.describe("Test Dialogs", async () => {
     await dialogPage.navigateToDialog();
     await dialogPage.acceptPromptAlert("Shabbir");
     assert.validatePartialText(
-      dialogPage.getVisibleMessageElement(),
+      await dialogPage.getVisibleMessageElementText(),
       "Shabbir",
     );
   });
