@@ -51,13 +51,16 @@ export class GUIElementsPage extends BasePage {
   }
 
   async selectDatePicker1(dateValue) {
-    await this.selectDateFromDatePicker(dateValue, "#datepicker");
+    await this.selectDateFromDatePicker(
+      dateValue,
+      this.actions.getLocator("css", "#datepicker"),
+    );
   }
 
   async selectDatePicker2(dateValue) {
     await this.selectDateFromDatePickerWithMonthYearDropdown(
       dateValue,
-      "#txtDate",
+      this.actions.getLocator("css", "#txtDate"),
     );
   }
 
@@ -81,7 +84,9 @@ export class GUIElementsPage extends BasePage {
     );
   }
 
-  getMessageLocator() {
-    return this.actions.getLocator("css", "#result");
+  async getMessageLocatorText() {
+    return await this.actions.getText(
+      this.actions.getLocator("css", "#result"),
+    );
   }
 }
