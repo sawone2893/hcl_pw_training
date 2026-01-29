@@ -16,7 +16,7 @@ export class DialogPage extends BasePage {
   async acceptPromptAlert(text) {
     await this.actions.typeInAlert("role", "button,Prompt Alert", text);
   }
-  getVisibleMessageElement() {
-    return this.actions.getLocator("css", "#demo");
+  async getVisibleMessageElement() {
+    return await this.actions.getLocator("css", "#demo");
   }
 }

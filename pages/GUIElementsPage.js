@@ -57,7 +57,7 @@ export class GUIElementsPage extends BasePage {
     await this.actions.clickElement("css", `button.submit-btn`);
   }
 
-  getMessageLocator(){
-    return this.actions.getLocator("css","#result");
+  async getMessageLocator(){
+    return await this.actions.getLocator("css","#result");
   }
 }
