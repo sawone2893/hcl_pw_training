@@ -16,7 +16,7 @@ export class BasePage {
     radioCheckboxLocator: (labelName) =>
       `//label[text()='${labelName}']/preceding::input[1]`,
     webTable: (attributeName, attributeValue) =>
-      "//table[@${attributeName}='${attributeValue}']/tbody/tr",
+      `//table[@${attributeName}='${attributeValue}']/tbody/tr`,
   };
 
   generateLocator(locatorIdentifier, params) {
@@ -101,11 +101,11 @@ export class BasePage {
     );
   }
 
-  async getRowsCount(tableRows) {
-    return await this.actions.getLocatorCount(tableRows);
+  async getRowsCellsCount(tableRowsCells) {
+    return await this.actions.getLocatorCount(tableRowsCells);
   }
 
-  async getNthRow(tableRows, index) {
+  async getNthRowCell(tableRows, index) {
     return await this.actions.getNthLocator(tableRows, index);
   }
 
@@ -114,6 +114,6 @@ export class BasePage {
   }
 
   async getSpecificRow(rows, searchText) {
-    return await this.getSpecificRow(rows, searchText);
+    return await this.actions.getSpecificLocator(rows, searchText);
   }
 }
