@@ -3,6 +3,7 @@ const { GUIElementsPage } = require("../pages/GUIElementsPage.js");
 const { DialogPage } = require("../pages/DialogPage.js");
 const { MouseKeyboardPage } = require("../pages/MouseKeyboardPage.js");
 const { WebTablePage } = require("../pages/WebTablePage.js");
+const { BrokenLinkPage } = require("../pages/BrokenLinkPage.js");
 const { WebAssertion } = require("../webAssertions/WebAssertions.js");
 exports.test = base.extend({
   //Define the "loginPage" fixture
@@ -26,6 +27,11 @@ exports.test = base.extend({
     await use(webTablePage);
   },
 
+  //Define the "brokenLinkPage" fixture
+  brokenLinkPage: async ({ page }, use) => {
+    const brokenLinkPage = new BrokenLinkPage(page);
+    await use(brokenLinkPage);
+  },
   assert: async ({}, use) => {
     const assert = new WebAssertion();
     await use(assert);
