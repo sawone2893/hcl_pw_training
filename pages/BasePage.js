@@ -44,31 +44,31 @@ export class BasePage {
     await this.actions.clickElement("xpath", datePickerLocator);
     //This code is check given date month and year is displayed of not
     while (
-      !(await this.actions.isDisplayed(
+      !(await this.actions.isDisplayed(this.actions.getLocator(
         "xpath",
         this.baseLocators.datePickerMonthYearWithOutDropdown(
           "month",
           monthText,
-        ),
+        )),
       ))
     ) {
       await this.actions.wait(1);
       if (monthIndex > currentMonthIndex) {
-        await this.actions.clickElement(
+        await this.actions.clickElement(this.actions.getLocator(
           "xpath",
           this.baseLocators.datePickerPrevNextArrowWithOutDropdown("Next"),
-        );
+        ));
       } else {
-        await this.actions.clickElement(
+        await this.actions.clickElement(this.actions.getLocator(
           "xpath",
           this.baseLocators.datePickerPrevNextArrowWithOutDropdown("Prev"),
-        );
+        ));
       }
     }
-    await this.actions.clickElement(
+    await this.actions.clickElement(this.actions.getLocator(
       "xpath",
       this.baseLocators.datePickerDay(dayText),
-    );
+    ));
   }
 
   async selectDateFromDatePickerWithMonthYearDropdown(
@@ -79,7 +79,7 @@ export class BasePage {
     const dayText = dateList[0];
     const monthText = dateList[1];
     const yearText = dateList[2];
-    await this.actions.clickElement("xpath", datePickerLocator);
+    await this.actions.clickElement(this.actions.getLocator("xpath", datePickerLocator));
     await this.actions.selectDropDown(
       this.baseLocators.datePickerSelectDropDownMonthYear("year"),
       yearText,
@@ -88,10 +88,10 @@ export class BasePage {
       this.baseLocators.datePickerSelectDropDownMonthYear("month"),
       monthText,
     );
-    await this.actions.clickElement(
+    await this.actions.clickElement(this.actions.getLocator(
       "xpath",
       this.baseLocators.datePickerDay(dayText),
-    );
+    ));
   }
 
   async getTableRows(attributeName, attributeValue) {
@@ -115,5 +115,32 @@ export class BasePage {
 
   async getSpecificRow(rows, searchText) {
     return await this.actions.getSpecificLocator(rows, searchText);
+  }
+
+  async setSliderRange(
+    silderElement,
+    sliderHeadMinElement,
+    sliderHeadMaxElement,
+    minValue,
+    maxValue,
+  ) {
+   const {sX,sY,sHeight,sWidth}= await this.actions.getElementBoundingBoxDimensions(silderElement);
+   const {headMinX}= await this.actions.getElementBoundingBoxDimensions(sliderHeadMinElement);
+   const {headMaxX}= await this.actions.getElementBoundingBoxDimensions(sliderHeadMaxElement);
+   const y=sY+sHeight/2;
+   const minX=sX+(sWidth*minValue/100);
+   const maxX=sX+(sWidth*maxValue/100);
+
+   //Moving HeadMin
+   await this.actions.moveMouseBy(headMinX,y);
+   await this.actions.performMouseDown();
+   await this.actions.moveMouseBy(minX,y);
+   await this.actions.performMouseUp();
+
+      //Moving HeadMax
+   await this.actions.moveMouseBy(headMaxX,y);
+   await this.actions.performMouseDown();
+   await this.actions.moveMouseBy(maxX,y);
+   await this.actions.performMouseUp();
   }
 }

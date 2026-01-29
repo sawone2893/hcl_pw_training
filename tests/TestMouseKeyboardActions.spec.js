@@ -61,5 +61,18 @@ test.describe(
         );
       },
     );
+
+    test(
+      "Select min head 20 and max head 40%",
+      { tag: "@slider" },
+      async ({ mouseKeyboardPage, assert }) => {
+        await mouseKeyboardPage.navigateToMouseKeyboard();
+        await mouseKeyboardPage.selectSliderRange(20,80);
+        assert.validatePartialText(
+          await mouseKeyboardPage.getSelectedPriceRange(),
+          "$100-$400",
+        );
+      },
+    );
   },
 );

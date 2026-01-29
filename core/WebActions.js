@@ -3,30 +3,29 @@ export class WebActions {
     this.page = page;
   }
 
-  async getLocator(locatortype, locator) {
+  getLocator(locatortype, locator) {
     switch (locatortype.toLowerCase()) {
       case "placeholder":
-        return await this.page.getByPlaceholder(locator);
+        return this.page.getByPlaceholder(locator);
       case "label":
-        return await this.page.getByLabel(locator);
+        return this.page.getByLabel(locator);
       case "text":
-        return await this.page.getByText(locator);
+        return this.page.getByText(locator);
       case "title":
-        return await this.page.getByTitle(locator);
+        return this.page.getByTitle(locator);
       case "testid":
-        return await this.page.getByTestId(locator);
+        return this.page.getByTestId(locator);
       case "role":
         let data = locator.split(",");
-        return await this.page.getByRole(`${data[0]}`, { name: `${data[1]}` });
+        return this.page.getByRole(`${data[0]}`, { name: `${data[1]}` });
       case "alttext":
-        return await this.page.getByAltText(locator);
+        return this.page.getByAltText(locator);
       case "xpath":
       case "css":
-        return await this.page.locator(locator);
+        return this.page.locator(locator);
       default:
         throw Error("Invalid Locator type!");
     }
-    return element;
   }
   async getLocatorCount(elements) {
     return await elements.count();
@@ -44,9 +43,6 @@ export class WebActions {
     await this.page.goto(url);
   }
 
-  async isDisplayed(locatortype, locator) {
-    return await this.getLocator(locatortype, locator).isVisible();
-  }
   async isDisplayed(element) {
     return await element.isVisible();
   }
@@ -55,9 +51,22 @@ export class WebActions {
     await this.page.waitForTimeout(timeInSeconds * 1000);
   }
 
-  async waitForElementToBeClickable(locatortype, locator) {
+  async isElementPresent(element) {
+    let status = false;
+    if ((await element.count()) > 0) {
+      if (await this.isDisplayed(element)) {
+        status = true;
+      } else {
+        status = false;
+      }
+    } else {
+      status = false;
+    }
+    return status;
+  }
+
+  async waitForElementToBeClickable(element) {
     try {
-      const element = await this.getLocator(locatortype, locator);
       await element.isEnabled({ timeout: 30000 });
     } catch (error) {
       console.error("Element is not clickable within the specified timeout.");
@@ -80,36 +89,11 @@ export class WebActions {
     }
   }
 
-  async waitUntillElementAppear(locatortype, locator, timeInSeconds = 120) {
-    let status = true;
-    try {
-      const startTime = Date.now();
-      while (!(await this.isDisplayed(locatortype, locator))) {
-        console.log(`Waiting for Element[${locator}] to be appear...`);
-        await this.waitForPageLoadState("networkidle");
-        await this.waitForPageLoadState("load");
-        await this.waitForPageLoadState("domcontentloaded");
-        await this.wait(1);
-        const endTime = Date.now();
-        if (endTime - startTime > timeInSeconds * 1000) {
-          break;
-        }
-      }
-    } catch (error) {
-      status = false;
-      console.error(
-        `Element:: ${locator} is not appear within the specified timeout.`,
-      );
-    }
-
-    return status;
-  }
-
   async waitUntillElementAppear(element, timeInSeconds = 120) {
     let status = true;
     try {
       const startTime = Date.now();
-      while (!(await this.isDisplayed(element))) {
+      while (!(await this.isElementPresent(element))) {
         console.log(`Waiting for Element to be appear...`);
         await this.waitForPageLoadState("networkidle");
         await this.waitForPageLoadState("load");
@@ -128,36 +112,32 @@ export class WebActions {
     return status;
   }
 
-  async clickElement(locatortype, locator) {
-    if (await this.waitUntillElementAppear(locatortype, locator)) {
-      await this.waitForElementToBeClickable(locatortype, locator);
-      const element = await this.getLocator(locatortype, locator);
+  async clickElement(element) {
+    if (await this.waitUntillElementAppear(element)) {
+      await this.waitForElementToBeClickable(element);
       await element.click();
     } else {
       throw new Error(
-        `Unable to perfrom click on Element :: locator:${locator} is not present in the DOM or displayed`,
+        `Unable to perfrom click on Element, is not present in the DOM or displayed`,
       );
     }
   }
-  async selectRadioCheckbox(locatortype, locator) {
-    if (await this.waitUntillElementAppear(locatortype, locator)) {
-      await this.waitForElementToBeClickable(locatortype, locator);
-      const element = await this.getLocator(locatortype, locator);
+  async selectRadioCheckbox(element) {
+    if (await this.waitUntillElementAppear(element)) {
       await element.check();
     } else {
       throw new Error(
-        `Unable to select Radio/Checkbox :: locator:${locator} is not present in the DOM or displayed`,
+        `Unable to select Radio/Checkbox, is not present in the DOM or displayed`,
       );
     }
   }
-  async typeText(locatortype, locator, text) {
-    if (await this.waitUntillElementAppear(locatortype, locator)) {
-      await this.waitForElementToBeClickable(locatortype, locator);
-      const element = await this.getLocator(locatortype, locator);
+  async typeText(element, text) {
+    if (await this.waitUntillElementAppear(element)) {
+      await this.waitForElementToBeClickable(element);
       await element.fill(text);
     } else {
       throw new Error(
-        `Unable to type in textbox/textarea :: locator:${locator} is not present in the DOM or displayed`,
+        `Unable to type in textbox/textarea, is not present in the DOM or displayed`,
       );
     }
   }
@@ -165,58 +145,53 @@ export class WebActions {
     await this.page.selectOption(locator, options);
   }
 
-  async acceptAlert(locatortype, locator) {
-    this.page.on("dialog", (dialog) => dialog.accept());
-    await this.clickElement(locatortype, locator);
+  async acceptAlert(element) {
+    this.page.once("dialog", (dialog) => dialog.accept());
+    await this.clickElement(element);
   }
 
-  async dismissAlert(locatortype, locator) {
+  async dismissAlert(element) {
     this.page.on("dialog", (dialog) => dialog.dismiss());
-    await this.clickElement(locatortype, locator);
+    await this.clickElement(element);
   }
 
-  async typeInAlert(locatortype, locator, text) {
+  async typeInAlert(element, text) {
     this.page.on("dialog", (dialog) => dialog.accept(text));
-    await this.clickElement(locatortype, locator);
+    await this.clickElement(element);
   }
 
   async closePage() {
     await this.page.close();
   }
 
-  async controlClickElement(locatortype, locator) {
-    if (await this.waitUntillElementAppear(locatortype, locator)) {
-      await this.waitForElementToBeClickable(locatortype, locator);
-      const element = await this.getLocator(locatortype, locator);
+  async controlClickElement(element) {
+    if (await this.waitUntillElementAppear(element)) {
+      await this.waitForElementToBeClickable(element);
       await element.click({ modifiers: ["Control"] });
     } else {
       throw new Error(
-        `Unable to perfrom control click on Element :: locator:${locator} is not present in the DOM or displayed`,
+        `Unable to perfrom control click on Element, is not present in the DOM or displayed`,
       );
     }
   }
 
-  async hoverElement(locatortype, locator) {
-    if (await this.waitUntillElementAppear(locatortype, locator)) {
-      const element = await this.getLocator(locatortype, locator);
+  async hoverElement(element) {
+    if (await this.waitUntillElementAppear(element)) {
       await element.hover();
-      console.log(`Hover perform on element: ${locator}`);
     } else {
       throw new Error(
-        `Unable to perfrom hover on Element :: locator:${locator} is not present in the DOM or displayed`,
+        `Unable to perfrom hover on Element, is not present in the DOM or displayed`,
       );
     }
   }
 
-  async dbClickElement(locatortype, locator) {
-    if (await this.waitUntillElementAppear(locatortype, locator)) {
-      await this.waitForElementToBeClickable(locatortype, locator);
-      const element = await this.getLocator(locatortype, locator);
+  async dbClickElement(element) {
+    if (await this.waitUntillElementAppear(element)) {
+      await this.waitForElementToBeClickable(element);
       await element.dblclick({ button: "left" });
-      console.log(`Clicked element: ${locator}`);
     } else {
       throw new Error(
-        `Unable to perform double click on Element :: locator:${locator} is not present in the DOM or displayed`,
+        `Unable to perform double click on Element,is not present in the DOM or displayed`,
       );
     }
   }
@@ -225,25 +200,15 @@ export class WebActions {
     await this.page.keyboard.type(text);
   }
 
-  async downloadFile(locatortype, locator, locationToSave) {
+  async downloadFile(element, locationToSave) {
     const downloadPromise = this.page.waitForEvent("download");
-    await this.clickElement(locatortype, locator);
+    await this.clickElement(element);
     const download = await downloadPromise;
     await download.saveAs(`${locationToSave}/${download.suggestedFilename()}`);
   }
 
   async getTextFromReadOnlyInput(locator) {
     return await this.page.inputValue(locator);
-  }
-
-  async getText(locatortype, locator) {
-    if (await this.waitUntillElementAppear(locatortype, locator)) {
-      return await this.getLocator(locatortype, locator).textContent();
-    } else {
-      throw new Error(
-        `Unable to fetch text for Element :: locator:${locator} is not present in the DOM or displayed`,
-      );
-    }
   }
 
   async getText(element) {
@@ -254,19 +219,43 @@ export class WebActions {
       "getText() failed: The 'element' provided is undefined or null.",
     );
   }
-  async performKeyOperation(keyComination) {
-    await this.page.keyboard.press(keyComination);
+  async performKeyOperation(keyCombination) {
+    await this.page.keyboard.press(keyCombination);
   }
 
-  async dragAndDrop(locatortype, srcLocator, destLocator) {
-    if (await this.waitUntillElementAppear(locatortype, srcLocator)) {
-      await this.getLocator(locatortype, srcLocator).dragTo(
-        await this.getLocator(locatortype, destLocator),
-      );
+  async dragAndDrop(srcElement, destElement) {
+    if (await this.waitUntillElementAppear(srcElement)) {
+      await srcElement.dragTo(destElement);
     } else {
       throw new Error(
-        `Unable to perform Drag and Drop on Element :: locator:${locator} is not present in the DOM or displayed`,
+        `Unable to perform Drag and Drop on Element, is not present in the DOM or displayed`,
       );
     }
+  }
+
+  async getElementBoundingBoxDimensions(element) {
+    if (await this.waitUntillElementAppear(element)) {
+      const box = await element.boundingBox();
+      const height = box.height;
+      const width = box.width;
+      const x = box.x;
+      const y = box.y;
+      return { x, y, height, width };
+    } else {
+      throw new Error(
+        "boundingBox() failed: The 'element' provided is undefined or null.",
+      );
+    }
+  }
+
+  async performMouseDown() {
+    await this.page.mouse.down();
+  }
+  async performMouseUp() {
+    await this.page.mouse.up();
+  }
+
+  async moveMouseBy(x, y) {
+    await this.page.mouse.move(x, y);
   }
 }

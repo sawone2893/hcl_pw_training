@@ -17,7 +17,7 @@ test.describe("Test Dialogs", async () => {
     await dialogPage.navigateToDialog();
     await dialogPage.acceptConfirmationAlert();
     assert.validatePartialText(
-      await dialogPage.getVisibleMessageElement(),
+      dialogPage.getVisibleMessageElement(),
       "You pressed OK!",
     );
   });
@@ -26,7 +26,7 @@ test.describe("Test Dialogs", async () => {
     await dialogPage.navigateToDialog();
     await dialogPage.acceptPromptAlert("Shabbir");
     assert.validatePartialText(
-      await dialogPage.getVisibleMessageElement(),
+      dialogPage.getVisibleMessageElement(),
       "Shabbir",
     );
   });

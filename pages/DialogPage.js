@@ -8,15 +8,22 @@ export class DialogPage extends BasePage {
     await this.actions.navigateTo("/");
   }
   async acceptSimpleAlert() {
-    await this.actions.acceptAlert("role", "button,Simple Alert");
+    await this.actions.acceptAlert(
+      this.actions.getLocator("role", "button,Simple Alert"),
+    );
   }
   async acceptConfirmationAlert() {
-    await this.actions.acceptAlert("role", "button,Confirmation Alert");
+    await this.actions.acceptAlert(
+      this.actions.getLocator("role", "button,Confirmation Alert"),
+    );
   }
   async acceptPromptAlert(text) {
-    await this.actions.typeInAlert("role", "button,Prompt Alert", text);
+    await this.actions.typeInAlert(
+      this.actions.getLocator("role", "button,Prompt Alert"),
+      text,
+    );
   }
-  async getVisibleMessageElement() {
-    return await this.actions.getLocator("css", "#demo");
+  getVisibleMessageElement() {
+    return this.actions.getLocator("css", "#demo");
   }
 }

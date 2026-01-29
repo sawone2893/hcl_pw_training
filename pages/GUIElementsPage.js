@@ -10,21 +10,34 @@ export class GUIElementsPage extends BasePage {
     await this.actions.navigateTo("/");
   }
   async enterName(name) {
-    await this.actions.typeText("placeholder", "Enter Name", name);
+    await this.actions.typeText(
+      this.actions.getLocator("placeholder", "Enter Name"),
+      name,
+    );
   }
   async enterEmail(email) {
-    await this.actions.typeText("placeholder", "Enter EMail", email);
+    await this.actions.typeText(
+      this.actions.getLocator("placeholder", "Enter EMail"),
+      email,
+    );
   }
   async enterPhone(phone) {
-    await this.actions.typeText("placeholder", "Enter Phone", phone);
+    await this.actions.typeText(
+      this.actions.getLocator("placeholder", "Enter Phone"),
+      phone,
+    );
   }
 
   async selectGender(gender) {
-    await this.actions.clickElement("css", `#${gender.toLowerCase()}`);
+    await this.actions.clickElement(
+      this.actions.getLocator("css", `#${gender.toLowerCase()}`),
+    );
   }
 
   async selectDay(name) {
-    await this.actions.selectRadioCheckbox("css", `#${name.toLowerCase()}`);
+    await this.actions.selectRadioCheckbox(
+      this.actions.getLocator("css", `#${name.toLowerCase()}`),
+    );
   }
 
   async selectCountry(name) {
@@ -42,22 +55,33 @@ export class GUIElementsPage extends BasePage {
   }
 
   async selectDatePicker2(dateValue) {
-    await this.selectDateFromDatePickerWithMonthYearDropdown(dateValue,"#txtDate");
+    await this.selectDateFromDatePickerWithMonthYearDropdown(
+      dateValue,
+      "#txtDate",
+    );
   }
 
   async selectStartDate(dateValue) {
-    await this.actions.typeText("placeholder", "Start Date", dateValue);
+    await this.actions.typeText(
+      this.actions.getLocator("placeholder", "Start Date"),
+      dateValue,
+    );
   }
 
   async selectEndDate(dateValue) {
-    await this.actions.typeText("placeholder", "End Date", dateValue);
+    await this.actions.typeText(
+      this.actions.getLocator("placeholder", "End Date"),
+      dateValue,
+    );
   }
 
-  async clickSubmitBtn(){
-    await this.actions.clickElement("css", `button.submit-btn`);
+  async clickSubmitBtn() {
+    await this.actions.clickElement(
+      this.actions.getLocator("css", `button.submit-btn`),
+    );
   }
 
-  async getMessageLocator(){
-    return await this.actions.getLocator("css","#result");
+  getMessageLocator() {
+    return this.actions.getLocator("css", "#result");
   }
 }

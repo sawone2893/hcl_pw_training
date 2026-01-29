@@ -15,5 +15,5 @@ test("Register User",{ tag: "@register" }, async ({ gUIElementsPage,assert }) =>
   await gUIElementsPage.selectStartDate(register.startDate);
   await gUIElementsPage.selectEndDate(register.endDate);
   await gUIElementsPage.clickSubmitBtn();
-  assert.validateExactText(await gUIElementsPage.getMessageLocator(),register.expectedMessage);
+  assert.validateExactText(gUIElementsPage.getMessageLocator(),register.expectedMessage);
 });
