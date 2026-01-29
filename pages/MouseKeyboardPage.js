@@ -13,24 +13,37 @@ export class MouseKeyboardPage extends BasePage {
     await this.actions.navigateTo("/");
   }
   async hoverPointMeAndSelectOption(optionName) {
-    await this.actions.hoverElement(this.actions.getLocator("role", "button,Point Me"));
-    await this.actions.clickElement(this.actions.getLocator("role", `link,${optionName}`));
+    await this.actions.hoverElement(
+      this.actions.getLocator("role", "button,Point Me"),
+    );
+    await this.actions.clickElement(
+      this.actions.getLocator("role", `link,${optionName}`),
+    );
   }
 
   async doubleClickCopyTextButton() {
-    await this.actions.doubleClickElement(this.actions.getLocator("text", "Copy Text"));
+    await this.actions.doubleClickElement(
+      this.actions.getLocator("text", "Copy Text"),
+    );
   }
   async getField2ElementText() {
     return await this.actions.getTextFromReadOnlyInput("#field2");
   }
   async performDragAndDrop() {
-    await this.actions.dragAndDrop(this.actions.getLocator("css", "#draggable"), this.actions.getLocator("css","#droppable"));
+    await this.actions.dragAndDrop(
+      this.actions.getLocator("css", "#draggable"),
+      this.actions.getLocator("css", "#droppable"),
+    );
   }
   async getDroppableElementText() {
-    return await this.actions.getText(this.actions.getLocator("xpath", this.pageLocators.droppableText));
+    return await this.actions.getText(
+      this.actions.getLocator("xpath", this.pageLocators.droppableText),
+    );
   }
   async selectDoubleClickHeadingTextAndPasteInField2() {
-    await this.actions.doubleClickElement(this.actions.getLocator("role", "heading,Double Click"));
+    await this.actions.doubleClickElement(
+      this.actions.getLocator("role", "heading,Double Click"),
+    );
     await this.actions.performKeyOperation("Control+C");
     await this.actions.clickElement(this.actions.getLocator("css", "#field2"));
     await this.actions.performKeyOperation("Control+A");
@@ -38,12 +51,12 @@ export class MouseKeyboardPage extends BasePage {
   }
 
   async selectSliderRange(minValue, maxValue) {
-    const silder = await this.actions.getLocator("css", "#slider-range");
-    const minHead = await this.actions.getLocator(
+    const silder = this.actions.getLocator("css", "#slider-range");
+    const minHead = this.actions.getLocator(
       "xpath",
       this.pageLocators.sliderMinMaxHead(1),
     );
-    const maxHead = await this.actions.getLocator(
+    const maxHead = this.actions.getLocator(
       "xpath",
       this.pageLocators.sliderMinMaxHead(2),
     );
