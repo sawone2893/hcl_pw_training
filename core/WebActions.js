@@ -3,35 +3,26 @@ export class WebActions {
     this.page = page;
   }
 
-  getLocator(locatortype, locator) {
-    let element;
+  async getLocator(locatortype, locator) {
     switch (locatortype.toLowerCase()) {
       case "placeholder":
-        element = this.page.getByPlaceholder(locator);
-        break;
+        return await this.page.getByPlaceholder(locator);
       case "label":
-        element = this.page.getByLabel(locator);
-        break;
+        return await this.page.getByLabel(locator);
       case "text":
-        element = this.page.getByText(locator);
-        break;
+        return await this.page.getByText(locator);
       case "title":
-        element = this.page.getByTitle(locator);
-        break;
+        return await this.page.getByTitle(locator);
       case "testid":
-        element = this.page.getByTestId(locator);
-        break;
+        return await this.page.getByTestId(locator);
       case "role":
         let data = locator.split(",");
-        element = this.page.getByRole(`${data[0]}`, { name: `${data[1]}` });
-        break;
+        return await this.page.getByRole(`${data[0]}`, { name: `${data[1]}` });
       case "alttext":
-        element = this.page.getByAltText();
-        break;
+        return await this.page.getByAltText(locator);
       case "xpath":
       case "css":
-        element = this.page.locator(locator);
-        break;
+        return await this.page.locator(locator);
       default:
         throw Error("Invalid Locator type!");
     }
@@ -47,7 +38,7 @@ export class WebActions {
     return await element.locator(locatorStr);
   }
   async getSpecificLocator(elements, searchText) {
-    return await elements.filter({ hasText: `${searchText}` });
+    return await elements.filter({ hasText: searchText });
   }
   async navigateTo(url) {
     await this.page.goto(url);
@@ -55,6 +46,9 @@ export class WebActions {
 
   async isDisplayed(locatortype, locator) {
     return await this.getLocator(locatortype, locator).isVisible();
+  }
+  async isDisplayed(element) {
+    return await element.isVisible();
   }
 
   async wait(timeInSeconds) {
@@ -111,8 +105,31 @@ export class WebActions {
     return status;
   }
 
+  async waitUntillElementAppear(element, timeInSeconds = 120) {
+    let status = true;
+    try {
+      const startTime = Date.now();
+      while (!(await this.isDisplayed(element))) {
+        console.log(`Waiting for Element to be appear...`);
+        await this.waitForPageLoadState("networkidle");
+        await this.waitForPageLoadState("load");
+        await this.waitForPageLoadState("domcontentloaded");
+        await this.wait(1);
+        const endTime = Date.now();
+        if (endTime - startTime > timeInSeconds * 1000) {
+          break;
+        }
+      }
+    } catch (error) {
+      status = false;
+      console.error(`Element is not appear within the specified timeout.`);
+    }
+
+    return status;
+  }
+
   async clickElement(locatortype, locator) {
-    if (this.waitUntillElementAppear(locatortype, locator)) {
+    if (await this.waitUntillElementAppear(locatortype, locator)) {
       await this.waitForElementToBeClickable(locatortype, locator);
       const element = await this.getLocator(locatortype, locator);
       await element.click();
@@ -123,7 +140,7 @@ export class WebActions {
     }
   }
   async selectRadioCheckbox(locatortype, locator) {
-    if (this.waitUntillElementAppear(locatortype, locator)) {
+    if (await this.waitUntillElementAppear(locatortype, locator)) {
       await this.waitForElementToBeClickable(locatortype, locator);
       const element = await this.getLocator(locatortype, locator);
       await element.check();
@@ -134,7 +151,7 @@ export class WebActions {
     }
   }
   async typeText(locatortype, locator, text) {
-    if (this.waitUntillElementAppear(locatortype, locator)) {
+    if (await this.waitUntillElementAppear(locatortype, locator)) {
       await this.waitForElementToBeClickable(locatortype, locator);
       const element = await this.getLocator(locatortype, locator);
       await element.fill(text);
@@ -145,8 +162,6 @@ export class WebActions {
     }
   }
   async selectDropDown(locator, options) {
-    // const element = await this.getLocator("", locator);
-    // await element.selectOption(options);
     await this.page.selectOption(locator, options);
   }
 
@@ -164,18 +179,13 @@ export class WebActions {
     this.page.on("dialog", (dialog) => dialog.accept(text));
     await this.clickElement(locatortype, locator);
   }
-  getText(locatortype, locator) {
-    return this.getLocator(locatortype, locator).textContent();
-  }
-  getText(locator) {
-    return locator.textContent();
-  }
+
   async closePage() {
     await this.page.close();
   }
 
   async controlClickElement(locatortype, locator) {
-    if (this.waitUntillElementAppear(locatortype, locator)) {
+    if (await this.waitUntillElementAppear(locatortype, locator)) {
       await this.waitForElementToBeClickable(locatortype, locator);
       const element = await this.getLocator(locatortype, locator);
       await element.click({ modifiers: ["Control"] });
@@ -187,7 +197,7 @@ export class WebActions {
   }
 
   async hoverElement(locatortype, locator) {
-    if (this.waitUntillElementAppear(locatortype, locator)) {
+    if (await this.waitUntillElementAppear(locatortype, locator)) {
       const element = await this.getLocator(locatortype, locator);
       await element.hover();
       console.log(`Hover perform on element: ${locator}`);
@@ -199,7 +209,7 @@ export class WebActions {
   }
 
   async dbClickElement(locatortype, locator) {
-    if (this.waitUntillElementAppear(locatortype, locator)) {
+    if (await this.waitUntillElementAppear(locatortype, locator)) {
       await this.waitForElementToBeClickable(locatortype, locator);
       const element = await this.getLocator(locatortype, locator);
       await element.dblclick({ button: "left" });
@@ -227,7 +237,7 @@ export class WebActions {
   }
 
   async getText(locatortype, locator) {
-    if (this.waitUntillElementAppear(locatortype, locator)) {
+    if (await this.waitUntillElementAppear(locatortype, locator)) {
       return await this.getLocator(locatortype, locator).textContent();
     } else {
       throw new Error(
@@ -236,14 +246,22 @@ export class WebActions {
     }
   }
 
+  async getText(element) {
+    if (await this.waitUntillElementAppear(element)) {
+      return await element.textContent();
+    }
+    throw new Error(
+      "getText() failed: The 'element' provided is undefined or null.",
+    );
+  }
   async performKeyOperation(keyComination) {
     await this.page.keyboard.press(keyComination);
   }
 
   async dragAndDrop(locatortype, srcLocator, destLocator) {
-    if (this.waitUntillElementAppear(locatortype, srcLocator)) {
+    if (await this.waitUntillElementAppear(locatortype, srcLocator)) {
       await this.getLocator(locatortype, srcLocator).dragTo(
-        this.getLocator(locatortype, destLocator),
+        await this.getLocator(locatortype, destLocator),
       );
     } else {
       throw new Error(
