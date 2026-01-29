@@ -244,8 +244,7 @@ export class WebActions {
   async getElementBoundingBoxDimensions(element) {
     if (await this.waitUntilElementAppears(element)) {
       const box = await element.boundingBox();
-      const { x, y, width, height } = box;
-      return { x, y, width, height };
+      return box;
     } else {
       throw new Error(
         "getElementBoundingBoxDimensions(): Element did not appear within the timeout.",
