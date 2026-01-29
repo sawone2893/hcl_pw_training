@@ -18,7 +18,7 @@ export class MouseKeyboardPage extends BasePage {
   }
 
   async doubleClickCopyTextButton() {
-    await this.actions.dbClickElement(this.actions.getLocator("text", "Copy Text"));
+    await this.actions.doubleClickElement(this.actions.getLocator("text", "Copy Text"));
   }
   async getField2ElementText() {
     return await this.actions.getTextFromReadOnlyInput("#field2");
@@ -30,7 +30,7 @@ export class MouseKeyboardPage extends BasePage {
     return await this.actions.getText(this.actions.getLocator("xpath", this.pageLocators.droppableText));
   }
   async selectDoubleClickHeadingTextAndPasteInField2() {
-    await this.actions.dbClickElement(this.actions.getLocator("role", "heading,Double Click"));
+    await this.actions.doubleClickElement(this.actions.getLocator("role", "heading,Double Click"));
     await this.actions.performKeyOperation("Control+C");
     await this.actions.clickElement(this.actions.getLocator("css", "#field2"));
     await this.actions.performKeyOperation("Control+A");
