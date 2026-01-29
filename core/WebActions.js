@@ -15,12 +15,21 @@ export class WebActions {
         return this.page.getByTitle(locator);
       case "testid":
         return this.page.getByTestId(locator);
-      case "role":
-        let data = locator.split(",");
-        return this.page.getByRole(`${data[0]}`, { name: `${data[1]}` });
+
+      case "role": {
+        const [role, name] = String(locator)
+          .split(",")
+          .map((s) => s.trim());
+        if (!role)
+          throw new Error(`getLocator(role): Missing role in "${locator}"`);
+        return name
+          ? this.page.getByRole(role, { name })
+          : this.page.getByRole(role);
+      }
       case "alttext":
         return this.page.getByAltText(locator);
       case "xpath":
+        return this.page.locator(`xpath=${locator}`);
       case "css":
         return this.page.locator(locator);
       default:
@@ -30,14 +39,14 @@ export class WebActions {
   async getLocatorCount(elements) {
     return await elements.count();
   }
-  async getNthLocator(elements, index) {
-    return await elements.nth(index);
+  getNthLocator(elements, index) {
+    return elements.nth(index);
   }
-  async getChildLocator(element, locatorStr) {
-    return await element.locator(locatorStr);
+  getChildLocator(element, locatorStr) {
+    return element.locator(locatorStr);
   }
-  async getSpecificLocator(elements, searchText) {
-    return await elements.filter({ hasText: searchText });
+  getSpecificLocator(elements, searchText) {
+    return elements.filter({ hasText: searchText });
   }
   async navigateTo(url) {
     await this.page.goto(url);
@@ -66,11 +75,8 @@ export class WebActions {
   }
 
   async waitForElementToBeClickable(element) {
-    try {
-      await element.isEnabled({ timeout: 30000 });
-    } catch (error) {
-      console.error("Element is not clickable within the specified timeout.");
-    }
+    await element.waitFor({ state: "visible", timeout: 30000 });
+    if (!(await element.isEnabled())) throw new Error("Element not enabled");
   }
 
   async waitForPageLoadState(eventName) {
@@ -89,7 +95,7 @@ export class WebActions {
     }
   }
 
-  async waitUntillElementAppear(element, timeInSeconds = 120) {
+  async waitUntilElementAppears(element, timeInSeconds = 120) {
     let status = true;
     try {
       const startTime = Date.now();
@@ -113,17 +119,17 @@ export class WebActions {
   }
 
   async clickElement(element) {
-    if (await this.waitUntillElementAppear(element)) {
+    if (await this.waitUntilElementAppears(element)) {
       await this.waitForElementToBeClickable(element);
       await element.click();
     } else {
       throw new Error(
-        `Unable to perfrom click on Element, is not present in the DOM or displayed`,
+        `Unable to perform click on Element, is not present in the DOM or displayed`,
       );
     }
   }
   async selectRadioCheckbox(element) {
-    if (await this.waitUntillElementAppear(element)) {
+    if (await this.waitUntilElementAppears(element)) {
       await element.check();
     } else {
       throw new Error(
@@ -132,7 +138,7 @@ export class WebActions {
     }
   }
   async typeText(element, text) {
-    if (await this.waitUntillElementAppear(element)) {
+    if (await this.waitUntilElementAppears(element)) {
       await this.waitForElementToBeClickable(element);
       await element.fill(text);
     } else {
@@ -151,12 +157,12 @@ export class WebActions {
   }
 
   async dismissAlert(element) {
-    this.page.on("dialog", (dialog) => dialog.dismiss());
+    this.page.once("dialog", (dialog) => dialog.dismiss());
     await this.clickElement(element);
   }
 
   async typeInAlert(element, text) {
-    this.page.on("dialog", (dialog) => dialog.accept(text));
+    this.page.once("dialog", (dialog) => dialog.accept(text));
     await this.clickElement(element);
   }
 
@@ -165,28 +171,28 @@ export class WebActions {
   }
 
   async controlClickElement(element) {
-    if (await this.waitUntillElementAppear(element)) {
+    if (await this.waitUntilElementAppears(element)) {
       await this.waitForElementToBeClickable(element);
       await element.click({ modifiers: ["Control"] });
     } else {
       throw new Error(
-        `Unable to perfrom control click on Element, is not present in the DOM or displayed`,
+        `Unable to perform control click on Element, is not present in the DOM or displayed`,
       );
     }
   }
 
   async hoverElement(element) {
-    if (await this.waitUntillElementAppear(element)) {
+    if (await this.waitUntilElementAppears(element)) {
       await element.hover();
     } else {
       throw new Error(
-        `Unable to perfrom hover on Element, is not present in the DOM or displayed`,
+        `Unable to perform hover on Element, is not present in the DOM or displayed`,
       );
     }
   }
 
-  async dbClickElement(element) {
-    if (await this.waitUntillElementAppear(element)) {
+  async doubleClickElement(element) {
+    if (await this.waitUntilElementAppears(element)) {
       await this.waitForElementToBeClickable(element);
       await element.dblclick({ button: "left" });
     } else {
@@ -212,7 +218,7 @@ export class WebActions {
   }
 
   async getText(element) {
-    if (await this.waitUntillElementAppear(element)) {
+    if (await this.waitUntilElementAppears(element)) {
       return await element.textContent();
     }
     throw new Error(
@@ -224,7 +230,7 @@ export class WebActions {
   }
 
   async dragAndDrop(srcElement, destElement) {
-    if (await this.waitUntillElementAppear(srcElement)) {
+    if (await this.waitUntilElementAppears(srcElement)) {
       await srcElement.dragTo(destElement);
     } else {
       throw new Error(
@@ -234,13 +240,9 @@ export class WebActions {
   }
 
   async getElementBoundingBoxDimensions(element) {
-    if (await this.waitUntillElementAppear(element)) {
+    if (await this.waitUntilElementAppears(element)) {
       const box = await element.boundingBox();
-      const height = box.height;
-      const width = box.width;
-      const x = box.x;
-      const y = box.y;
-      return { x, y, height, width };
+      return ({ x, y, height, width } = box);
     } else {
       throw new Error(
         "boundingBox() failed: The 'element' provided is undefined or null.",
@@ -255,7 +257,11 @@ export class WebActions {
     await this.page.mouse.up();
   }
 
-  async moveMouseBy(x, y) {
+  async moveMouseTo(x, y) {
     await this.page.mouse.move(x, y);
+  }
+
+  async getElementAttribute(element, attributeName) {
+    return await element.getAttribute(attributeName);
   }
 }
