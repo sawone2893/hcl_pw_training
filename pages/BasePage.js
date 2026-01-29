@@ -134,12 +134,18 @@ export class BasePage {
     minValue,
     maxValue,
   ) {
-    const { sX, sY, sHeight, sWidth } =
+    const sliderDimension =
       await this.actions.getElementBoundingBoxDimensions(silderElement);
-    const { headMinX } =
+    const sX = sliderDimension.x;
+    const sY = sliderDimension.y;
+    const sWidth = sliderDimension.width;
+    const sHeight = sliderDimension.height;
+    const headMinDimension =
       await this.actions.getElementBoundingBoxDimensions(sliderHeadMinElement);
-    const { headMaxX } =
+    const headMinX = headMinDimension.x;
+    const headMaxDimension =
       await this.actions.getElementBoundingBoxDimensions(sliderHeadMaxElement);
+    const headMaxX = headMaxDimension.x;
     const y = sY + sHeight / 2;
     const minX = sX + (sWidth * minValue) / 100;
     const maxX = sX + (sWidth * maxValue) / 100;
