@@ -4,7 +4,7 @@ export class WebActions {
   }
 
   getLocator(locatortype, locator) {
-    switch (locatortype.toLowerCase()) {
+    switch (locatortype.toLowerCase() || "") {
       case "placeholder":
         return this.page.getByPlaceholder(locator);
       case "label":
@@ -56,27 +56,35 @@ export class WebActions {
     return await element.isVisible();
   }
 
+  async isElementEnabled(element) {
+    return await element.isEnabled();
+  }
+  async isElementEditable(element) {
+    return await element.isEditable();
+  }
+
   async wait(timeInSeconds) {
     await this.page.waitForTimeout(timeInSeconds * 1000);
   }
 
-  async isElementPresent(element) {
-    let status = false;
-    if ((await element.count()) > 0) {
-      if (await this.isDisplayed(element)) {
-        status = true;
-      } else {
-        status = false;
-      }
-    } else {
-      status = false;
+  async waitForElement(element, elementState, timeInSeconds) {
+    try {
+      await element.waitFor({
+        state: elementState,
+        timeout: timeInSeconds * 1000,
+      });
+      return true;
+    } catch {
+      return false;
     }
-    return status;
   }
 
   async waitForElementToBeClickable(element) {
-    await element.waitFor({ state: "visible", timeout: 30000 });
-    if (!(await element.isEnabled())) throw new Error("Element not enabled");
+    if (!(await this.waitForElement(element, "visible"))) {
+      throw new Error("Element is not visible");
+    }
+    if (!(await this.isElementEnabled(element)))
+      throw new Error("Element is visible but not enabled");
   }
 
   async waitForPageLoadState(eventName) {
@@ -96,59 +104,49 @@ export class WebActions {
   }
 
   async waitUntilElementAppears(element, timeInSeconds = 120) {
-    let status = true;
-    try {
-      const startTime = Date.now();
-      while (!(await this.isElementPresent(element))) {
-        console.log(`Waiting for Element to be appear...`);
-        await this.waitForPageLoadState("networkidle");
-        await this.waitForPageLoadState("load");
-        await this.waitForPageLoadState("domcontentloaded");
-        await this.wait(1);
-        const endTime = Date.now();
-        if (endTime - startTime > timeInSeconds * 1000) {
-          break;
-        }
-      }
-    } catch (error) {
-      status = false;
-      console.error(`Element is not appear within the specified timeout.`);
-    }
-
-    return status;
+    return this.waitForElement(element, "visible", timeInSeconds);
   }
 
   async clickElement(element) {
-    if (await this.waitUntilElementAppears(element)) {
-      await this.waitForElementToBeClickable(element);
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
       await element.click();
     } else {
       throw new Error(
-        `Unable to perform click on Element, is not present in the DOM or displayed`,
+        `Unable to perform click on Element, is not present in the DOM or displayed or disabled`,
       );
     }
   }
   async selectRadioCheckbox(element) {
-    if (await this.waitUntilElementAppears(element)) {
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
       await element.check();
     } else {
       throw new Error(
-        `Unable to select Radio/Checkbox, is not present in the DOM or displayed`,
+        `Unable to select Radio/Checkbox, is not present in the DOM or displayed or disabled`,
       );
     }
   }
   async typeText(element, text) {
-    if (await this.waitUntilElementAppears(element)) {
-      await this.waitForElementToBeClickable(element);
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEditable(element))
+    ) {
       await element.fill(text);
     } else {
       throw new Error(
-        `Unable to type in textbox/textarea, is not present in the DOM or displayed`,
+        `Unable to type in textbox/textarea, is not present in the DOM or displayed or non editable`,
       );
     }
   }
   async selectDropDown(locator, options) {
-    await this.page.selectOption(locator, options);
+    return typeof locator === "string"
+      ? await this.page.selectOption(locator, options)
+      : await locator.selectOption(options);
   }
 
   async acceptAlert(element) {
@@ -171,12 +169,14 @@ export class WebActions {
   }
 
   async controlClickElement(element) {
-    if (await this.waitUntilElementAppears(element)) {
-      await this.waitForElementToBeClickable(element);
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
       await element.click({ modifiers: ["Control"] });
     } else {
       throw new Error(
-        `Unable to perform control click on Element, is not present in the DOM or displayed`,
+        `Unable to perform control click on Element, is not present in the DOM or displayed or disabled`,
       );
     }
   }
@@ -192,12 +192,14 @@ export class WebActions {
   }
 
   async doubleClickElement(element) {
-    if (await this.waitUntilElementAppears(element)) {
-      await this.waitForElementToBeClickable(element);
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
       await element.dblclick({ button: "left" });
     } else {
       throw new Error(
-        `Unable to perform double click on Element,is not present in the DOM or displayed`,
+        `Unable to perform double click on Element,is not present in the DOM or displayed or disabled`,
       );
     }
   }
@@ -214,16 +216,16 @@ export class WebActions {
   }
 
   async getTextFromReadOnlyInput(locator) {
-    return await this.page.inputValue(locator);
+    return typeof locator === "string"
+      ? await this.page.inputValue(locator)
+      : await locator.inputValue();
   }
 
   async getText(element) {
     if (await this.waitUntilElementAppears(element)) {
-      return await element.textContent();
+      return (await element.textContent()) ?? "";
     }
-    throw new Error(
-      "getText() failed: The 'element' provided is undefined or null.",
-    );
+    throw new Error("getText(): Element did not appear within the timeout.");
   }
   async performKeyOperation(keyCombination) {
     await this.page.keyboard.press(keyCombination);
@@ -242,10 +244,11 @@ export class WebActions {
   async getElementBoundingBoxDimensions(element) {
     if (await this.waitUntilElementAppears(element)) {
       const box = await element.boundingBox();
-      return ({ x, y, height, width } = box);
+      const { x, y, width, height } = box;
+      return { x, y, width, height };
     } else {
       throw new Error(
-        "boundingBox() failed: The 'element' provided is undefined or null.",
+        "getElementBoundingBoxDimensions(): Element did not appear within the timeout.",
       );
     }
   }
