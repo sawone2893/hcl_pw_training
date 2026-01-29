@@ -44,31 +44,39 @@ export class BasePage {
     await this.actions.clickElement("xpath", datePickerLocator);
     //This code is check given date month and year is displayed of not
     while (
-      !(await this.actions.isDisplayed(this.actions.getLocator(
-        "xpath",
-        this.baseLocators.datePickerMonthYearWithOutDropdown(
-          "month",
-          monthText,
-        )),
+      !(await this.actions.isDisplayed(
+        this.actions.getLocator(
+          "xpath",
+          this.baseLocators.datePickerMonthYearWithOutDropdown(
+            "month",
+            monthText,
+          ),
+        ),
       ))
     ) {
       await this.actions.wait(1);
       if (monthIndex > currentMonthIndex) {
-        await this.actions.clickElement(this.actions.getLocator(
-          "xpath",
-          this.baseLocators.datePickerPrevNextArrowWithOutDropdown("Next"),
-        ));
+        await this.actions.clickElement(
+          this.actions.getLocator(
+            "xpath",
+            this.baseLocators.datePickerPrevNextArrowWithOutDropdown("Next"),
+          ),
+        );
       } else {
-        await this.actions.clickElement(this.actions.getLocator(
-          "xpath",
-          this.baseLocators.datePickerPrevNextArrowWithOutDropdown("Prev"),
-        ));
+        await this.actions.clickElement(
+          this.actions.getLocator(
+            "xpath",
+            this.baseLocators.datePickerPrevNextArrowWithOutDropdown("Prev"),
+          ),
+        );
       }
     }
-    await this.actions.clickElement(this.actions.getLocator(
-      "xpath",
-      this.baseLocators.datePickerDay(dayText),
-    ));
+    await this.actions.clickElement(
+      this.actions.getLocator(
+        "xpath",
+        this.baseLocators.datePickerDay(dayText),
+      ),
+    );
   }
 
   async selectDateFromDatePickerWithMonthYearDropdown(
@@ -79,7 +87,9 @@ export class BasePage {
     const dayText = dateList[0];
     const monthText = dateList[1];
     const yearText = dateList[2];
-    await this.actions.clickElement(this.actions.getLocator("xpath", datePickerLocator));
+    await this.actions.clickElement(
+      this.actions.getLocator("xpath", datePickerLocator),
+    );
     await this.actions.selectDropDown(
       this.baseLocators.datePickerSelectDropDownMonthYear("year"),
       yearText,
@@ -88,33 +98,35 @@ export class BasePage {
       this.baseLocators.datePickerSelectDropDownMonthYear("month"),
       monthText,
     );
-    await this.actions.clickElement(this.actions.getLocator(
-      "xpath",
-      this.baseLocators.datePickerDay(dayText),
-    ));
+    await this.actions.clickElement(
+      this.actions.getLocator(
+        "xpath",
+        this.baseLocators.datePickerDay(dayText),
+      ),
+    );
   }
 
-  async getTableRows(attributeName, attributeValue) {
-    return await this.actions.getLocator(
+  getTableRows(attributeName, attributeValue) {
+    return this.actions.getLocator(
       "xpath",
       this.baseLocators.webTable(attributeName, attributeValue),
     );
   }
 
-  async getRowsCellsCount(tableRowsCells) {
-    return await this.actions.getLocatorCount(tableRowsCells);
+  getRowsCellsCount(tableRowsCells) {
+    return this.actions.getLocatorCount(tableRowsCells);
   }
 
-  async getNthRowCell(tableRows, index) {
-    return await this.actions.getNthLocator(tableRows, index);
+  getNthRowCell(tableRows, index) {
+    return this.actions.getNthLocator(tableRows, index);
   }
 
-  async getRowCells(row, cellLocator) {
-    return await this.actions.getChildLocator(row, cellLocator);
+  getRowCells(row, cellLocator) {
+    return this.actions.getChildLocator(row, cellLocator);
   }
 
-  async getSpecificRow(rows, searchText) {
-    return await this.actions.getSpecificLocator(rows, searchText);
+  getSpecificRow(rows, searchText) {
+    return this.actions.getSpecificLocator(rows, searchText);
   }
 
   async setSliderRange(
@@ -124,23 +136,26 @@ export class BasePage {
     minValue,
     maxValue,
   ) {
-   const {sX,sY,sHeight,sWidth}= await this.actions.getElementBoundingBoxDimensions(silderElement);
-   const {headMinX}= await this.actions.getElementBoundingBoxDimensions(sliderHeadMinElement);
-   const {headMaxX}= await this.actions.getElementBoundingBoxDimensions(sliderHeadMaxElement);
-   const y=sY+sHeight/2;
-   const minX=sX+(sWidth*minValue/100);
-   const maxX=sX+(sWidth*maxValue/100);
+    const { sX, sY, sHeight, sWidth } =
+      await this.actions.getElementBoundingBoxDimensions(silderElement);
+    const { headMinX } =
+      await this.actions.getElementBoundingBoxDimensions(sliderHeadMinElement);
+    const { headMaxX } =
+      await this.actions.getElementBoundingBoxDimensions(sliderHeadMaxElement);
+    const y = sY + sHeight / 2;
+    const minX = sX + (sWidth * minValue) / 100;
+    const maxX = sX + (sWidth * maxValue) / 100;
 
-   //Moving HeadMin
-   await this.actions.moveMouseBy(headMinX,y);
-   await this.actions.performMouseDown();
-   await this.actions.moveMouseBy(minX,y);
-   await this.actions.performMouseUp();
+    //Moving HeadMin
+    await this.actions.moveMouseTo(headMinX, y);
+    await this.actions.performMouseDown();
+    await this.actions.moveMouseTo(minX, y);
+    await this.actions.performMouseUp();
 
-      //Moving HeadMax
-   await this.actions.moveMouseBy(headMaxX,y);
-   await this.actions.performMouseDown();
-   await this.actions.moveMouseBy(maxX,y);
-   await this.actions.performMouseUp();
+    //Moving HeadMax
+    await this.actions.moveMouseTo(headMaxX, y);
+    await this.actions.performMouseDown();
+    await this.actions.moveMouseTo(maxX, y);
+    await this.actions.performMouseUp();
   }
 }
