@@ -34,14 +34,14 @@ export class BasePage {
     return xpath;
   }
 
-  async selectDateFromDatePicker(dateValue, datePickerLocator) {
+  async selectDateFromDatePicker(dateValue, datePickerElement) {
     const dateList = dateValue.split(" ");
     const dayText = dateList[0];
     const monthText = dateList[1];
     const yearText = dateList[2];
     const monthIndex = getFullMonthIndex(monthText);
     const currentMonthIndex = getCurrentMonthIndex();
-    await this.actions.clickElement("xpath", datePickerLocator);
+    await this.actions.clickElement(datePickerElement);
     //This code is check given date month and year is displayed of not
     while (
       !(await this.actions.isDisplayed(
@@ -81,15 +81,13 @@ export class BasePage {
 
   async selectDateFromDatePickerWithMonthYearDropdown(
     dateValue,
-    datePickerLocator,
+    datePickerElement,
   ) {
     const dateList = dateValue.split(" ");
     const dayText = dateList[0];
     const monthText = dateList[1];
     const yearText = dateList[2];
-    await this.actions.clickElement(
-      this.actions.getLocator("xpath", datePickerLocator),
-    );
+    await this.actions.clickElement(datePickerElement);
     await this.actions.selectDropDown(
       this.baseLocators.datePickerSelectDropDownMonthYear("year"),
       yearText,
