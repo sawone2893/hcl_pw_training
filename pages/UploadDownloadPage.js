@@ -37,4 +37,30 @@ export class UploadDownloadPage extends BasePage {
       this.actions.getLocator("css", "#multipleFilesStatus"),
     );
   }
+
+  async clickDownloadFilesLink() {
+    await this.actions.clickElement(
+      this.actions.getLocator("text", "Download Files"),
+    );
+  }
+
+  async generateFile(fileText, fileType) {
+    await this.actions.typeText(
+      this.actions.getLocator("label", "Enter Text:"),
+      fileText,
+    );
+    await this.actions.clickElement(
+      this.actions.getLocator(
+        "role",
+        `button,Generate and Download ${fileType} File`,
+      ),
+    );
+  }
+
+  async downloadGenerateFile(fileType, locationToSave) {
+    await this.actions.downloadFile(
+      this.actions.getLocator("text", `Download ${fileType} File`),
+      locationToSave,
+    );
+  }
 }
