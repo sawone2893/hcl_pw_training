@@ -223,7 +223,7 @@ export class WebActions {
 
   async getText(element) {
     if (await this.waitUntilElementAppears(element)) {
-      return (await element.textContent()) ?? "";
+      return await element.textContent();
     }
     throw new Error("getText(): Element did not appear within the timeout.");
   }
@@ -265,5 +265,15 @@ export class WebActions {
 
   async getElementAttribute(element, attributeName) {
     return await element.getAttribute(attributeName);
+  }
+  async uploadFilesByInputTypeFile(element, files) {
+    await element.setInputFiles(files);
+  }
+
+  async uploadFiles(element, files) {
+    const fileChooserPromise = page.waitForEvent("filechooser");
+    await this.clickElement(element);
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(files);
   }
 }
