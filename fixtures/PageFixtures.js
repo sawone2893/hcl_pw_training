@@ -8,6 +8,7 @@ import { UploadDownloadPage } from "../pages/UploadDownloadPage.js";
 import { WebAssertion } from "../webAssertions/WebAssertions.js";
 
 export const test = base.extend({
+
   //Define the "GUIElementsPage" fixture
   gUIElementsPage: async ({ page }, use) => {
     await use(new GUIElementsPage(page));
@@ -32,8 +33,8 @@ export const test = base.extend({
   uploadDownloadPage: async ({ page }, use) => {
     await use(new UploadDownloadPage(page));
   },
-  assert: async ({}, use) => {
-    await use(new WebAssertion());
+  assert: async ({page}, use) => {
+    await use(new WebAssertion(page));
   },
 });
 

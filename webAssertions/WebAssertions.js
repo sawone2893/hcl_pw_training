@@ -1,6 +1,9 @@
-import { expect } from "../fixtures/PageFixtures";
+import { expect} from "../fixtures/PageFixtures";
 import { FileManager } from "../utils/FileManager";
 export class WebAssertion {
+  constructor(page) {
+    this.page = page;
+  }
   validatePartialText(actualtext, expectedText) {
     expect(actualtext).toContain(expectedText);
   }
@@ -54,7 +57,7 @@ export class WebAssertion {
   }
 
   async verifyPageTitle(expectedTitle) {
-    await expect(this.page).toHaveTitle(expectedTitle);
+    await expect(thispage).toHaveTitle(expectedTitle);
   }
 
   async verifyCurrentPageURLContains(expectedText) {
