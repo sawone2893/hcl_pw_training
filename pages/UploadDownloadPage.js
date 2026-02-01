@@ -1,5 +1,5 @@
 import { BasePage } from "./BasePage";
-
+import { FileManager } from "../utils/FileManager";
 export class UploadDownloadPage extends BasePage {
   constructor(page) {
     super(page);
@@ -43,24 +43,33 @@ export class UploadDownloadPage extends BasePage {
       this.actions.getLocator("text", "Download Files"),
     );
   }
-
-  async generateFile(fileText, fileType) {
+  async enterTextToGenerateFile(fileText) {
     await this.actions.typeText(
       this.actions.getLocator("label", "Enter Text:"),
       fileText,
     );
+  }
+
+  async clickGenerateFile(fileType) {
     await this.actions.clickElement(
       this.actions.getLocator(
-        "role",
-        `button,Generate and Download ${fileType} File`,
+        "text",
+        `Generate and Download ${fileType} File`,
       ),
     );
   }
 
-  async downloadGenerateFile(fileType, locationToSave) {
-    await this.actions.downloadFile(
-      this.actions.getLocator("text", `Download ${fileType} File`),
+  getDownloadLinkLocator(fileType) {
+    return this.actions.getLocator("role", `link,Download ${fileType} File`);
+  }
+
+  async downloadGeneratedFile(fileType, locationToSave, fileName) {
+    const newFileName = `${locationToSave}/${fileName}`;
+    FileManager.deleteFile(newFileName);
+    const downloadedFilePath = await this.actions.downloadFile(
+      this.getDownloadLinkLocator(fileType),
       locationToSave,
     );
+    FileManager.renameFile(downloadedFilePath, newFileName);
   }
 }
