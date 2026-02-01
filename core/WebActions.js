@@ -212,7 +212,9 @@ export class WebActions {
     const downloadPromise = this.page.waitForEvent("download");
     await this.clickElement(element);
     const download = await downloadPromise;
-    await download.saveAs(`${locationToSave}/${download.suggestedFilename()}`);
+    const downloadedFilePath = `${locationToSave}/${download.suggestedFilename()}`;
+    await download.saveAs(downloadedFilePath);
+    return downloadedFilePath;
   }
 
   async getTextFromReadOnlyInput(locator) {
