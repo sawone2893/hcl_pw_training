@@ -1,6 +1,7 @@
 https://playwright.dev/docs/test-assertions
 https://playwright.dev/docs/test-annotations
 https://hclcontent.percipio.com/journey/5ece9d19-99b1-4c6d-abf1-1d3ccab2cce3
+https://admin-demo.nopcommerce.com/login?returnUrl=%2Fadmin%2F
 Commands to execute test:
 1. To run all test: 
     npx playwright test

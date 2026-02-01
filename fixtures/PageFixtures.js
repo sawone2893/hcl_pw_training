@@ -1,22 +1,40 @@
-const { test: base } = require("@playwright/test");
-const { GUIElementsPage } = require("../pages/GUIElementsPage.js");
-const { DialogPage } = require("../pages/DialogPage.js");
-const {WebAssertion}=require("../webAssertions/WebAssertions.js")
-exports.test = base.extend({
-  //Define the "loginPage" fixture
+import { test as base } from "@playwright/test";
+import { GUIElementsPage } from "../pages/GUIElementsPage.js";
+import { DialogPage } from "../pages/DialogPage.js";
+import { MouseKeyboardPage } from "../pages/MouseKeyboardPage.js";
+import { WebTablePage } from "../pages/WebTablePage.js";
+import { BrokenLinkPage } from "../pages/BrokenLinkPage.js";
+import { UploadDownloadPage } from "../pages/UploadDownloadPage.js";
+import { WebAssertion } from "../webAssertions/WebAssertions.js";
+
+export const test = base.extend({
+  //Define the "GUIElementsPage" fixture
   gUIElementsPage: async ({ page }, use) => {
-    const gUIElementsPage = new GUIElementsPage(page);
-    await use(gUIElementsPage);
+    await use(new GUIElementsPage(page));
   },
-  //Define the "dialogPage" fixture
+  //Define the "DialogPage" fixture
   dialogPage: async ({ page }, use) => {
-    const dialogPage = new DialogPage(page);
-    await use(dialogPage);
+    await use(new DialogPage(page));
   },
-    assert: async ({}, use) => {
-    const assert = new WebAssertion();
-    await use(assert);
+  //Define the "MouseKeyboardPage" fixture
+  mouseKeyboardPage: async ({ page }, use) => {
+    await use(new MouseKeyboardPage(page));
+  },
+  //Define the "WebTablePage" fixture
+  webTablePage: async ({ page }, use) => {
+    await use(new WebTablePage(page));
+  },
+  //Define the "BrokenLinkPage" fixture
+  brokenLinkPage: async ({ page }, use) => {
+    await use(new BrokenLinkPage(page));
+  },
+  //Define the "UploadDownloadPage" fixture
+  uploadDownloadPage: async ({ page }, use) => {
+    await use(new UploadDownloadPage(page));
+  },
+  assert: async ({}, use) => {
+    await use(new WebAssertion());
   },
 });
 
-exports.expect = base.expect;
+export const expect = base.expect;

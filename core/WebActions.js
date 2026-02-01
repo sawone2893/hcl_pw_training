@@ -4,186 +4,276 @@ export class WebActions {
   }
 
   getLocator(locatortype, locator) {
-    let element;
-    switch (locatortype.toLowerCase()) {
+    switch (locatortype.toLowerCase() || "") {
       case "placeholder":
-        element = this.page.getByPlaceholder(locator);
-        break;
+        return this.page.getByPlaceholder(locator);
       case "label":
-        element = this.page.getByLabel(locator);
-        break;
+        return this.page.getByLabel(locator);
       case "text":
-        element = this.page.getByText(locator);
-        break;
+        return this.page.getByText(locator);
       case "title":
-        element = this.page.getByTitle(locator);
-        break;
+        return this.page.getByTitle(locator);
       case "testid":
-        element = this.page.getByTestId(locator);
-        break;
-      case "role":
-        let data = locator.split(",");
-        element = this.page.getByRole(`${data[0]}`, { name: `${data[1]}` });
-        break;
+        return this.page.getByTestId(locator);
+
+      case "role": {
+        const [role, name] = String(locator)
+          .split(",")
+          .map((s) => s.trim());
+        if (!role)
+          throw new Error(`getLocator(role): Missing role in "${locator}"`);
+        return name
+          ? this.page.getByRole(role, { name })
+          : this.page.getByRole(role);
+      }
       case "alttext":
-        element = this.page.getByAltText();
-        break;
+        return this.page.getByAltText(locator);
       case "xpath":
+        return this.page.locator(`xpath=${locator}`);
       case "css":
-        element = this.page.locator(locator);
-        break;
+        return this.page.locator(locator);
       default:
         throw Error("Invalid Locator type!");
     }
-    return element;
+  }
+  async getLocatorCount(elements) {
+    return await elements.count();
+  }
+  getNthLocator(elements, index) {
+    return elements.nth(index);
+  }
+  getChildLocator(element, locatorStr) {
+    return element.locator(locatorStr);
+  }
+  getSpecificLocator(elements, searchText) {
+    return elements.filter({ hasText: searchText });
   }
   async navigateTo(url) {
     await this.page.goto(url);
   }
-  async clickElement(locatortype, locator) {
-    await this.getLocator(locatortype, locator).click();
-  }
-  async selectRadioCheckbox(locatortype, locator) {
-    await this.getLocator(locatortype, locator).check();
-  }
-  async typeText(locatortype, locator, text) {
-    await this.getLocator(locatortype, locator).fill(text);
-  }
-  async selectDropDown(locator, options) {
-    // const element = await this.getLocator("", locator);
-    // await element.selectOption(options);
-    await this.page.selectOption(locator, options);
+
+  async isDisplayed(element) {
+    return await element.isVisible();
   }
 
-  async acceptAlert(locatortype, locator) {
-    this.page.on("dialog", (dialog) => dialog.accept());
-    await this.clickElement(locatortype, locator);
+  async isElementEnabled(element) {
+    return await element.isEnabled();
   }
-
-  async dismissAlert(locatortype, locator) {
-    this.page.on("dialog", (dialog) => dialog.dismiss());
-    await this.clickElement(locatortype, locator);
-  }
-
-  async typeInAlert(locatortype, locator, text) {
-    this.page.on("dialog", (dialog) => dialog.accept(text));
-    await this.clickElement(locatortype, locator);
-  }
-  getText(locatortype, locator) {
-    return this.getLocator(locatortype, locator).textContent();
-  }
-  async closePage() {
-    await this.page.close();
-  }
-
-  async isDisplayed(locatortype, locator) {
-    return await this.getLocator(locatortype, locator).isVisible();
+  async isElementEditable(element) {
+    return await element.isEditable();
   }
 
   async wait(timeInSeconds) {
     await this.page.waitForTimeout(timeInSeconds * 1000);
   }
 
-  // async waitForPageLoadState(eventName) {
-  //   switch (eventName.toLowerCase()) {
-  //     case "networkidle":
-  //       await this.page.waitForLoadState("networkidle");
-  //       break;
-  //     case "load":
-  //       await this.page.waitForLoadState("load");
-  //       break;
-  //     case "domcontentloaded":
-  //       await this.page.waitForLoadState("domcontentloaded");
-  //       break;
-  //     default:
-  //       throw new Error(`Invalid Event Name: ${eventName}`);
-  //   }
-  // }
+  async waitForElement(element, elementState, timeInSeconds) {
+    try {
+      await element.waitFor({
+        state: elementState,
+        timeout: timeInSeconds * 1000,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
-  // async waitUntillElementAppear(locatortype, locator, timeInSeconds = 120) {
-  //   let status = true;
-  //   try {
-  //     const startTime = Date.now();
-  //     while (!(await this.isDisplayed(locatortype, locator))) {
-  //       console.log(`Waiting for Element[${locator}] to be appear...`);
-  //       await this.waitForPageLoadState("networkidle");
-  //       await this.waitForPageLoadState("load");
-  //       await this.waitForPageLoadState("domcontentloaded");
-  //       await this.wait(1);
-  //       const endTime = Date.now();
-  //       if (endTime - startTime > timeInSeconds * 1000) {
-  //         break;
-  //       }
-  //     }
-  //   } catch (error) {
-  //     status = false;
-  //     console.error(
-  //       `Element:: ${locator} is not appear within the specified timeout.`,
-  //     );
-  //   }
+  async waitForElementToBeClickable(element) {
+    if (!(await this.waitForElement(element, "visible"))) {
+      throw new Error("Element is not visible");
+    }
+    if (!(await this.isElementEnabled(element)))
+      throw new Error("Element is visible but not enabled");
+  }
 
-  //   return status;
-  // }
+  async waitForPageLoadState(eventName) {
+    switch (eventName.toLowerCase()) {
+      case "networkidle":
+        await this.page.waitForLoadState("networkidle");
+        break;
+      case "load":
+        await this.page.waitForLoadState("load");
+        break;
+      case "domcontentloaded":
+        await this.page.waitForLoadState("domcontentloaded");
+        break;
+      default:
+        throw new Error(`Invalid Event Name: ${eventName}`);
+    }
+  }
 
-  // async waitForElementToBeClickable(locatortype, locator) {
-  //   try {
-  //     const element = await this.getLocator(locatortype, locator);
-  //     await element.isEnabled({ timeout: 30000 });
-  //   } catch (error) {
-  //     console.error("Element is not clickable within the specified timeout.");
-  //   }
-  // }
+  async waitUntilElementAppears(element, timeInSeconds = 120) {
+    return this.waitForElement(element, "visible", timeInSeconds);
+  }
 
-  // async controlClickElement(locatortype, locator) {
-  //   if (this.waitUntillElementAppear(locatortype, locator)) {
-  //     await this.waitForElementToBeClickable(locatortype, locator);
-  //     const element = await this.getLocator(locatortype, locator);
-  //     await element.click({ modifiers: ["Control"] });
-  //     console.log(`Control clicked perform on element: ${locator}`);
-  //   } else {
-  //     throw new Error(
-  //       `Unable to perfrom control click on Element with locator:${locator} is not present in the DOM or displayed`,
-  //     );
-  //   }
-  // }
+  async clickElement(element) {
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
+      await element.click();
+    } else {
+      throw new Error(
+        `Unable to perform click on Element, is not present in the DOM or displayed or disabled`,
+      );
+    }
+  }
+  async selectRadioCheckbox(element) {
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
+      await element.check();
+    } else {
+      throw new Error(
+        `Unable to select Radio/Checkbox, is not present in the DOM or displayed or disabled`,
+      );
+    }
+  }
+  async typeText(element, text) {
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEditable(element))
+    ) {
+      await element.fill(text);
+    } else {
+      throw new Error(
+        `Unable to type in textbox/textarea, is not present in the DOM or displayed or non editable`,
+      );
+    }
+  }
+  async selectDropDown(locator, options) {
+    return typeof locator === "string"
+      ? await this.page.selectOption(locator, options)
+      : await locator.selectOption(options);
+  }
 
-  // async hoverElement(locatortype, locator) {
-  //   if (this.waitUntillElementAppear(locatortype, locator)) {
-  //     const element = await this.getLocator(locatortype, locator);
-  //     await element.hover();
-  //     console.log(`Hover perform on element: ${locator}`);
-  //   } else {
-  //     throw new Error(
-  //       `Unable to perfrom hover on Element with locator:${locator} is not present in the DOM or displayed`,
-  //     );
-  //   }
-  // }
+  async acceptAlert(element) {
+    this.page.once("dialog", (dialog) => dialog.accept());
+    await this.clickElement(element);
+  }
 
-  // async dbClickElement(locatortype, locator) {
-  //   if (this.waitUntillElementAppear(locatortype, locator)) {
-  //     await this.waitForElementToBeClickable(locatortype, locator);
-  //     const element = await this.getLocator(locatortype, locator);
-  //     await element.dblclick({ button: "left" });
-  //     console.log(`Clicked element: ${locator}`);
-  //   } else {
-  //     throw new Error(
-  //       `Unable to click Element with locator:${locator} is not present in the DOM or displayed`,
-  //     );
-  //   }
-  // }
+  async dismissAlert(element) {
+    this.page.once("dialog", (dialog) => dialog.dismiss());
+    await this.clickElement(element);
+  }
 
-  // async typeUsingKeyBoard(text) {
-  //   await this.page.keyboard.type(text);
-  // }
+  async typeInAlert(element, text) {
+    this.page.once("dialog", (dialog) => dialog.accept(text));
+    await this.clickElement(element);
+  }
 
-  // async downloadFile(locatortype, locator, locationToSave) {
-  //   const downloadPromise = this.page.waitForEvent("download");
-  //   await this.clickElement(locatortype, locator);
-  //   const download = await downloadPromise;
-  //   await download.saveAs(`${locationToSave}/${download.suggestedFilename()}`);
-  // }
+  async closePage() {
+    await this.page.close();
+  }
 
-  // async getTextFromReadOnlyInput(locator) {
-  //   return await this.page.inputValue(locator);
-  // }
+  async controlClickElement(element) {
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
+      await element.click({ modifiers: ["Control"] });
+    } else {
+      throw new Error(
+        `Unable to perform control click on Element, is not present in the DOM or displayed or disabled`,
+      );
+    }
+  }
+
+  async hoverElement(element) {
+    if (await this.waitUntilElementAppears(element)) {
+      await element.hover();
+    } else {
+      throw new Error(
+        `Unable to perform hover on Element, is not present in the DOM or displayed`,
+      );
+    }
+  }
+
+  async doubleClickElement(element) {
+    if (
+      (await this.waitUntilElementAppears(element)) &&
+      (await this.isElementEnabled(element))
+    ) {
+      await element.dblclick({ button: "left" });
+    } else {
+      throw new Error(
+        `Unable to perform double click on Element,is not present in the DOM or displayed or disabled`,
+      );
+    }
+  }
+
+  async typeUsingKeyBoard(text) {
+    await this.page.keyboard.type(text);
+  }
+
+  async downloadFile(element, locationToSave) {
+    const downloadPromise = this.page.waitForEvent("download");
+    await this.clickElement(element);
+    const download = await downloadPromise;
+    await download.saveAs(`${locationToSave}/${download.suggestedFilename()}`);
+  }
+
+  async getTextFromReadOnlyInput(locator) {
+    return typeof locator === "string"
+      ? await this.page.inputValue(locator)
+      : await locator.inputValue();
+  }
+
+  async getText(element) {
+    if (await this.waitUntilElementAppears(element)) {
+      return await element.textContent();
+    }
+    throw new Error("getText(): Element did not appear within the timeout.");
+  }
+  async performKeyOperation(keyCombination) {
+    await this.page.keyboard.press(keyCombination);
+  }
+
+  async dragAndDrop(srcElement, destElement) {
+    if (await this.waitUntilElementAppears(srcElement)) {
+      await srcElement.dragTo(destElement);
+    } else {
+      throw new Error(
+        `Unable to perform Drag and Drop on Element, is not present in the DOM or displayed`,
+      );
+    }
+  }
+
+  async getElementBoundingBoxDimensions(element) {
+    if (await this.waitUntilElementAppears(element)) {
+      const box = await element.boundingBox();
+      return box;
+    } else {
+      throw new Error(
+        "getElementBoundingBoxDimensions(): Element did not appear within the timeout.",
+      );
+    }
+  }
+
+  async performMouseDown() {
+    await this.page.mouse.down();
+  }
+  async performMouseUp() {
+    await this.page.mouse.up();
+  }
+
+  async moveMouseTo(x, y) {
+    await this.page.mouse.move(x, y);
+  }
+
+  async getElementAttribute(element, attributeName) {
+    return await element.getAttribute(attributeName);
+  }
+  async uploadFilesByInputTypeFile(element, files) {
+    await element.setInputFiles(files);
+  }
+
+  async uploadFiles(element, files) {
+    const fileChooserPromise = page.waitForEvent("filechooser");
+    await this.clickElement(element);
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(files);
+  }
 }
