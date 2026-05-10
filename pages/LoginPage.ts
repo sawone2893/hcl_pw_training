@@ -1,7 +1,16 @@
+import type { Page, Locator } from "@playwright/test";
 export class LoginPage {
-  constructor(page) {
+  private page: Page;
+  private usernameInput: Locator;
+  private passwordInput: Locator;
+  private loginBtn: Locator;
+  private errorMessage: Locator;
+  private rememberMeCheckbox: Locator;
+  private forgotPasswordLink: Locator;
+
+  constructor(page: Page) {
     this.page = page;
-    
+
     // Locators
     this.usernameInput = page.getByPlaceholder("Username");
     this.passwordInput = page.getByPlaceholder("Password");
@@ -21,14 +30,14 @@ export class LoginPage {
   /**
    * Fill username field
    */
-  async enterUsername(username) {
+  async enterUsername(username: string) {
     await this.usernameInput.fill(username);
   }
 
   /**
    * Fill password field
    */
-  async enterPassword(password) {
+  async enterPassword(password: string) {
     await this.passwordInput.fill(password);
   }
 
@@ -42,7 +51,7 @@ export class LoginPage {
   /**
    * Complete login with credentials
    */
-  async appLogin(username, password) {
+  async appLogin(username: string, password: string) {
     await this.enterUsername(username);
     await this.enterPassword(password);
     await this.clickLoginButton();

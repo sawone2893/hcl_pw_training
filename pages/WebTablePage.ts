@@ -1,13 +1,14 @@
+import type { Page } from "@playwright/test";
 import { BasePage } from "./BasePage";
 export class WebTablePage extends BasePage {
-  constructor(page) {
+  constructor(page: Page) {
     super(page);
   }
   pageLocators = {};
   async navigateToWebTablePage() {
     await this.actions.navigateTo("/");
   }
-  async getStaticWebTableRowByBookName(bookName) {
+  async getStaticWebTableRowByBookName(bookName: string) {
     const rows = this.getTableRows("name", "BookTable");
     console.log(`Rows Count: ${await this.getRowsCellsCount(rows)}`);
     const row = this.getSpecificRow(rows, bookName);

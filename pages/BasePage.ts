@@ -1,40 +1,44 @@
+import type { Page, Locator } from "@playwright/test";
 import { WebActions } from "../core/WebActions";
 import { getCurrentMonthIndex, getFullMonthIndex } from "../utils/DateManager";
 export class BasePage {
-  constructor(page) {
+  protected page: Page;
+  protected actions: WebActions;
+  constructor(page: Page) {
+    this.page = page;
     this.actions = new WebActions(page);
   }
 
   baseLocators = {
-    datePickerMonthYearWithOutDropdown: (monthYear, monthYearValue) =>
+    datePickerMonthYearWithOutDropdown: (monthYear: string, monthYearValue: string) =>
       `//span[contains(@class,'${monthYear}') and text()='${monthYearValue}']`,
-    datePickerPrevNextArrowWithOutDropdown: (arrowName) =>
+    datePickerPrevNextArrowWithOutDropdown: (arrowName: string) =>
       `//a[@title='${arrowName}']`,
-    datePickerDay: (daytext) => `//a[@data-date='${daytext}']`,
-    datePickerSelectDropDownMonthYear: (dropdownType) =>
+    datePickerDay: (daytext: string) => `//a[@data-date='${daytext}']`,
+    datePickerSelectDropDownMonthYear: (dropdownType: string) =>
       `//select[contains(@aria-label,'${dropdownType}')]`,
-    radioCheckboxLocator: (labelName) =>
+    radioCheckboxLocator: (labelName: string) =>
       `//label[text()='${labelName}']/preceding::input[1]`,
-    webTable: (attributeName, attributeValue) =>
+    webTable: (attributeName: string, attributeValue: string) =>
       `//table[@${attributeName}='${attributeValue}']/tbody/tr`,
   };
 
-  generateLocator(locatorIdentifier, params) {
-    xpath = locatorIdentifier;
-    if (params.contains("~")) {
-      values = params.split("~");
+  generateLocator(locatorIdentifier: string, params: string) {
+    let xpath = locatorIdentifier;
+    if (params.includes("~")) {
+      const values = params.split("~");
       for (let i = 0; i < values.length; i++) {
-        newXpath = xpath.replace("#" + i + "#", values[i]);
+        const newXpath = xpath.replace("#" + i + "#", values[i]);
         xpath = newXpath;
       }
     } else {
-      newXpath = xpath.replace("#0#", params);
+      const newXpath = xpath.replace("#0#", params);
       xpath = newXpath;
     }
     return xpath;
   }
 
-  async selectDateFromDatePicker(dateValue, datePickerElement) {
+  async selectDateFromDatePicker(dateValue: string, datePickerElement: Locator) {
     const dateList = dateValue.split(" ");
     const dayText = dateList[0];
     const monthText = dateList[1];
@@ -80,8 +84,8 @@ export class BasePage {
   }
 
   async selectDateFromDatePickerWithMonthYearDropdown(
-    dateValue,
-    datePickerElement,
+    dateValue: string,
+    datePickerElement: Locator,
   ) {
     const dateList = dateValue.split(" ");
     const dayText = dateList[0];
@@ -104,47 +108,56 @@ export class BasePage {
     );
   }
 
-  getTableRows(attributeName, attributeValue) {
+  getTableRows(attributeName: string, attributeValue: string) {
     return this.actions.getLocator(
       "xpath",
       this.baseLocators.webTable(attributeName, attributeValue),
     );
   }
 
-  getRowsCellsCount(tableRowsCells) {
+  getRowsCellsCount(tableRowsCells: Locator) {
     return this.actions.getLocatorCount(tableRowsCells);
   }
 
-  getNthRowCell(tableRows, index) {
+  getNthRowCell(tableRows: Locator, index: number) {
     return this.actions.getNthLocator(tableRows, index);
   }
 
-  getRowCells(row, cellLocator) {
+  getRowCells(row: Locator, cellLocator: string) {
     return this.actions.getChildLocator(row, cellLocator);
   }
 
-  getSpecificRow(rows, searchText) {
+  getSpecificRow(rows: Locator, searchText: string) {
     return this.actions.getSpecificLocator(rows, searchText);
   }
 
   async setSliderRange(
-    silderElement,
-    sliderHeadMinElement,
-    sliderHeadMaxElement,
-    minValue,
-    maxValue,
+    silderElement: Locator,
+    sliderHeadMinElement: Locator,
+    sliderHeadMaxElement: Locator,
+    minValue: number,
+    maxValue: number,
   ) {
     const sliderDimension =
       await this.actions.getElementBoundingBoxDimensions(silderElement);
+    if (!sliderDimension) {
+      throw new Error("Unable to retrieve slider dimensions.");
+    }
     const sX = sliderDimension.x;
     const sY = sliderDimension.y;
     const sWidth = sliderDimension.width;
     const sHeight = sliderDimension.height;
     const headMinDimension =
       await this.actions.getElementBoundingBoxDimensions(sliderHeadMinElement);
+    if (!headMinDimension) {
+      throw new Error("Unable to retrieve slider handle min dimensions.");
+    }
     const headMinX = headMinDimension.x;
     const headMaxDimension =
       await this.actions.getElementBoundingBoxDimensions(sliderHeadMaxElement);
+    if (!headMaxDimension) {
+      throw new Error("Unable to retrieve slider handle max dimensions.");
+    }
     const headMaxX = headMaxDimension.x;
     const y = sY + sHeight / 2;
     const minX = sX + (sWidth * minValue) / 100;

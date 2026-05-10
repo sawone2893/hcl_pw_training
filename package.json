@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:qa": "set ENV=qa&&npx playwright test --grep @register --headed",
+    "pretest": "echo Setting ENV=qa for Playwright",
+    "test": "set ENV=qa&&npx playwright test",
+    "test:qa": "set ENV=qa&&npx playwright test --grep @downloadFile --headed",
     "test:dev": "set ENV=dev&&npx playwright test --grep @register --headed"
   },
   "keywords": [],
@@ -13,7 +15,9 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "@types/node": "^25.0.6",
-    "dotenv": "^17.2.3"
+    "@types/node": "^25.6.2",
+    "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
   }
 }

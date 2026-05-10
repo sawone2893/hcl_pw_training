@@ -1,14 +1,15 @@
+import type { Page } from "@playwright/test";
 import { BasePage } from "./BasePage";
 import { FileManager } from "../utils/FileManager";
 export class UploadDownloadPage extends BasePage {
-  constructor(page) {
+  constructor(page: Page) {
     super(page);
   }
   pageLocators = {};
   async navigateToUploadDownloadPage() {
     await this.actions.navigateTo("/");
   }
-  async uploadSingleFile(file) {
+  async uploadSingleFile(file: string | string[]) {
     await this.actions.uploadFilesByInputTypeFile(
       this.actions.getLocator("css", "#singleFileInput"),
       file,
@@ -17,7 +18,7 @@ export class UploadDownloadPage extends BasePage {
       this.actions.getLocator("role", "button,Upload Single File"),
     );
   }
-  async uploadMultipleFiles(files) {
+  async uploadMultipleFiles(files: string | string[]) {
     await this.actions.uploadFilesByInputTypeFile(
       this.actions.getLocator("css", "#multipleFilesInput"),
       files,
@@ -43,14 +44,14 @@ export class UploadDownloadPage extends BasePage {
       this.actions.getLocator("text", "Download Files"),
     );
   }
-  async enterTextToGenerateFile(fileText) {
+  async enterTextToGenerateFile(fileText: string) {
     await this.actions.typeText(
       this.actions.getLocator("label", "Enter Text:"),
       fileText,
     );
   }
 
-  async clickGenerateFile(fileType) {
+  async clickGenerateFile(fileType: string) {
     await this.actions.clickElement(
       this.actions.getLocator(
         "text",
@@ -59,11 +60,11 @@ export class UploadDownloadPage extends BasePage {
     );
   }
 
-  getDownloadLinkLocator(fileType) {
+  getDownloadLinkLocator(fileType: string) {
     return this.actions.getLocator("role", `link,Download ${fileType} File`);
   }
 
-  async downloadGeneratedFile(fileType, locationToSave, fileName) {
+  async downloadGeneratedFile(fileType: string, locationToSave: string, fileName: string) {
     const newFileName = `${locationToSave}/${fileName}`;
     FileManager.deleteFile(newFileName);
     const downloadedFilePath = await this.actions.downloadFile(

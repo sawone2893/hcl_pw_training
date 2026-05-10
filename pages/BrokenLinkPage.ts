@@ -1,7 +1,8 @@
-import { BasePage } from "../pages/BasePage";
-export class BrokenLinkPage extends BasePage{
-  constructor(page){
-    super(page)
+import type { Page } from "@playwright/test";
+import { BasePage } from "./BasePage";
+export class BrokenLinkPage extends BasePage {
+  constructor(page: Page) {
+    super(page);
   }
   pageLocator={
     brokenLink:"//div[@id='broken-links']/a",

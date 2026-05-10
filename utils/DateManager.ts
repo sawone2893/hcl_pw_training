@@ -1,4 +1,4 @@
-export function getFullMonthIndex(monthName) {
+export function getFullMonthIndex(monthName: string) {
   const months = [
     "january",
     "february",
@@ -17,7 +17,7 @@ export function getFullMonthIndex(monthName) {
   return months.indexOf(monthName.toLowerCase()) + 1;
 }
 
-export function getShortMonthIndex(monthName) {
+export function getShortMonthIndex(monthName: string) {
   const months = [
     "jan",
     "feb",

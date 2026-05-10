@@ -1,9 +1,12 @@
+import type { Page, Locator } from "@playwright/test";
+
 export class WebActions {
-  constructor(page) {
+  private page: Page;
+  constructor(page: Page) {
     this.page = page;
   }
 
-  getLocator(locatortype, locator) {
+  getLocator(locatortype: string, locator: string) {
     switch (locatortype.toLowerCase() || "") {
       case "placeholder":
         return this.page.getByPlaceholder(locator);
@@ -23,8 +26,8 @@ export class WebActions {
         if (!role)
           throw new Error(`getLocator(role): Missing role in "${locator}"`);
         return name
-          ? this.page.getByRole(role, { name })
-          : this.page.getByRole(role);
+          ? this.page.getByRole(role as any, { name })
+          : this.page.getByRole(role as any);
       }
       case "alttext":
         return this.page.getByAltText(locator);
@@ -36,38 +39,38 @@ export class WebActions {
         throw Error("Invalid Locator type!");
     }
   }
-  async getLocatorCount(elements) {
+  async getLocatorCount(elements: Locator) {
     return await elements.count();
   }
-  getNthLocator(elements, index) {
+  getNthLocator(elements: Locator, index: number) {
     return elements.nth(index);
   }
-  getChildLocator(element, locatorStr) {
+  getChildLocator(element: Locator, locatorStr: string) {
     return element.locator(locatorStr);
   }
-  getSpecificLocator(elements, searchText) {
+  getSpecificLocator(elements: Locator, searchText: string) {
     return elements.filter({ hasText: searchText });
   }
-  async navigateTo(url) {
+  async navigateTo(url: string) {
     await this.page.goto(url);
   }
 
-  async isDisplayed(element) {
+  async isDisplayed(element: Locator) {
     return await element.isVisible();
   }
 
-  async isElementEnabled(element) {
+  async isElementEnabled(element: Locator) {
     return await element.isEnabled();
   }
-  async isElementEditable(element) {
+  async isElementEditable(element: Locator) {
     return await element.isEditable();
   }
 
-  async wait(timeInSeconds) {
+  async wait(timeInSeconds: number) {
     await this.page.waitForTimeout(timeInSeconds * 1000);
   }
 
-  async waitForElement(element, elementState, timeInSeconds) {
+  async waitForElement(element: Locator, elementState: "visible" | "hidden" | "attached" | "detached", timeInSeconds: number) {
     try {
       await element.waitFor({
         state: elementState,
@@ -79,15 +82,15 @@ export class WebActions {
     }
   }
 
-  async waitForElementToBeClickable(element) {
-    if (!(await this.waitForElement(element, "visible"))) {
+  async waitForElementToBeClickable(element: Locator) {
+    if (!(await this.waitForElement(element, "visible", 30))) {
       throw new Error("Element is not visible");
     }
     if (!(await this.isElementEnabled(element)))
       throw new Error("Element is visible but not enabled");
   }
 
-  async waitForPageLoadState(eventName) {
+  async waitForPageLoadState(eventName: string) {
     switch (eventName.toLowerCase()) {
       case "networkidle":
         await this.page.waitForLoadState("networkidle");
@@ -103,11 +106,11 @@ export class WebActions {
     }
   }
 
-  async waitUntilElementAppears(element, timeInSeconds = 120) {
+  async waitUntilElementAppears(element: Locator, timeInSeconds = 120) {
     return this.waitForElement(element, "visible", timeInSeconds);
   }
 
-  async clickElement(element) {
+  async clickElement(element: Locator) {
     if (
       (await this.waitUntilElementAppears(element)) &&
       (await this.isElementEnabled(element))
@@ -119,7 +122,7 @@ export class WebActions {
       );
     }
   }
-  async selectRadioCheckbox(element) {
+  async selectRadioCheckbox(element: Locator) {
     if (
       (await this.waitUntilElementAppears(element)) &&
       (await this.isElementEnabled(element))
@@ -131,7 +134,7 @@ export class WebActions {
       );
     }
   }
-  async typeText(element, text) {
+  async typeText(element: Locator, text: string) {
     if (
       (await this.waitUntilElementAppears(element)) &&
       (await this.isElementEditable(element))
@@ -143,23 +146,23 @@ export class WebActions {
       );
     }
   }
-  async selectDropDown(locator, options) {
+  async selectDropDown(locator: string | Locator, options: string | string[]) {
     return typeof locator === "string"
       ? await this.page.selectOption(locator, options)
       : await locator.selectOption(options);
   }
 
-  async acceptAlert(element) {
+  async acceptAlert(element: Locator) {
     this.page.once("dialog", (dialog) => dialog.accept());
     await this.clickElement(element);
   }
 
-  async dismissAlert(element) {
+  async dismissAlert(element: Locator) {
     this.page.once("dialog", (dialog) => dialog.dismiss());
     await this.clickElement(element);
   }
 
-  async typeInAlert(element, text) {
+  async typeInAlert(element: Locator, text: string) {
     this.page.once("dialog", (dialog) => dialog.accept(text));
     await this.clickElement(element);
   }
@@ -168,7 +171,7 @@ export class WebActions {
     await this.page.close();
   }
 
-  async controlClickElement(element) {
+  async controlClickElement(element: Locator) {
     if (
       (await this.waitUntilElementAppears(element)) &&
       (await this.isElementEnabled(element))
@@ -181,7 +184,7 @@ export class WebActions {
     }
   }
 
-  async hoverElement(element) {
+  async hoverElement(element: Locator) {
     if (await this.waitUntilElementAppears(element)) {
       await element.hover();
     } else {
@@ -191,7 +194,7 @@ export class WebActions {
     }
   }
 
-  async doubleClickElement(element) {
+  async doubleClickElement(element: Locator) {
     if (
       (await this.waitUntilElementAppears(element)) &&
       (await this.isElementEnabled(element))
@@ -204,11 +207,11 @@ export class WebActions {
     }
   }
 
-  async typeUsingKeyBoard(text) {
+  async typeUsingKeyBoard(text: string) {
     await this.page.keyboard.type(text);
   }
 
-  async downloadFile(element, locationToSave) {
+  async downloadFile(element: Locator, locationToSave: string) {
     const downloadPromise = this.page.waitForEvent("download");
     await this.clickElement(element);
     const download = await downloadPromise;
@@ -217,23 +220,23 @@ export class WebActions {
     return downloadedFilePath;
   }
 
-  async getTextFromReadOnlyInput(locator) {
+  async getTextFromReadOnlyInput(locator: string | Locator) {
     return typeof locator === "string"
       ? await this.page.inputValue(locator)
       : await locator.inputValue();
   }
 
-  async getText(element) {
+  async getText(element: Locator) {
     if (await this.waitUntilElementAppears(element)) {
       return await element.textContent();
     }
     throw new Error("getText(): Element did not appear within the timeout.");
   }
-  async performKeyOperation(keyCombination) {
+  async performKeyOperation(keyCombination: string) {
     await this.page.keyboard.press(keyCombination);
   }
 
-  async dragAndDrop(srcElement, destElement) {
+  async dragAndDrop(srcElement: Locator, destElement: Locator) {
     if (await this.waitUntilElementAppears(srcElement)) {
       await srcElement.dragTo(destElement);
     } else {
@@ -243,7 +246,7 @@ export class WebActions {
     }
   }
 
-  async getElementBoundingBoxDimensions(element) {
+  async getElementBoundingBoxDimensions(element: Locator) {
     if (await this.waitUntilElementAppears(element)) {
       const box = await element.boundingBox();
       return box;
@@ -261,19 +264,19 @@ export class WebActions {
     await this.page.mouse.up();
   }
 
-  async moveMouseTo(x, y) {
+  async moveMouseTo(x: number, y: number) {
     await this.page.mouse.move(x, y);
   }
 
-  async getElementAttribute(element, attributeName) {
+  async getElementAttribute(element: Locator, attributeName: string) {
     return await element.getAttribute(attributeName);
   }
-  async uploadFilesByInputTypeFile(element, files) {
+  async uploadFilesByInputTypeFile(element: Locator, files: string | string[]) {
     await element.setInputFiles(files);
   }
 
-  async uploadFiles(element, files) {
-    const fileChooserPromise = page.waitForEvent("filechooser");
+  async uploadFiles(element: Locator, files: string | string[]) {
+    const fileChooserPromise = this.page.waitForEvent("filechooser");
     await this.clickElement(element);
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(files);

@@ -1,18 +1,19 @@
-import { BasePage } from "../pages/BasePage";
+import type { Page } from "@playwright/test";
+import { BasePage } from "./BasePage";
 export class MouseKeyboardPage extends BasePage {
-  constructor(page) {
+  constructor(page: Page) {
     super(page);
   }
   pageLocators = {
     droppableText: "//div[@id='droppable']/p",
-    sliderMinMaxHead: (index) =>
+    sliderMinMaxHead: (index: number) =>
       `//span[contains(@class,'ui-slider-handle')][${index}]`,
   };
 
   async navigateToMouseKeyboard() {
     await this.actions.navigateTo("/");
   }
-  async hoverPointMeAndSelectOption(optionName) {
+  async hoverPointMeAndSelectOption(optionName: string) {
     await this.actions.hoverElement(
       this.actions.getLocator("role", "button,Point Me"),
     );
@@ -50,7 +51,7 @@ export class MouseKeyboardPage extends BasePage {
     await this.actions.performKeyOperation("Control+V");
   }
 
-  async selectSliderRange(minValue, maxValue) {
+  async selectSliderRange(minValue: number, maxValue: number) {
     const silder = this.actions.getLocator("css", "#slider-range");
     const minHead = this.actions.getLocator(
       "xpath",

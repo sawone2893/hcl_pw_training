@@ -1,6 +1,7 @@
-import { BasePage } from "../pages/BasePage";
+import type { Page } from "@playwright/test";
+import { BasePage } from "./BasePage";
 export class DialogPage extends BasePage {
-  constructor(page) {
+  constructor(page: Page) {
     super(page);
   }
   pageLocators = {};
@@ -17,7 +18,7 @@ export class DialogPage extends BasePage {
       this.actions.getLocator("role", "button,Confirmation Alert"),
     );
   }
-  async acceptPromptAlert(text) {
+  async acceptPromptAlert(text: string) {
     await this.actions.typeInAlert(
       this.actions.getLocator("role", "button,Prompt Alert"),
       text,
